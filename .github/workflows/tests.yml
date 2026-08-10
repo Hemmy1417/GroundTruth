@@ -1,0 +1,51 @@
+name: tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  contract:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: contract
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install tooling
+        run: pip install pytest "genlayer-test==0.29.2" genvm-linter
+      - name: genvm-lint (download runtime + check)
+        run: |
+          genvm-lint download
+          genvm-lint check groundtruth.py --json
+      - name: Provision direct-mode runtime
+        # gltest's own download URL 404s (no genvm-universal asset on that
+        # release); genvm-lint's cache holds a compatible tarball — seed
+        # gltest's cache so its exists() check short-circuits the download.
+        run: |
+          mkdir -p ~/.cache/gltest-direct
+          find ~/.cache -name 'genvm-universal-*.tar.xz' -exec cp -n {} ~/.cache/gltest-direct/ \;
+          ls -la ~/.cache/gltest-direct/
+      - name: Direct-mode tests
+        run: pytest tests/direct/ -q
+
+  web:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: npm ci
+      - run: npx tsc --noEmit
+      - run: npm test
+      - run: npm run build
+        env:
+          NEXT_PUBLIC_CONTRACT_ADDRESS: "0x0000000000000000000000000000000000000000"

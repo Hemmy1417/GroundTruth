@@ -1,0 +1,31 @@
+# ── secrets: never committed, no exceptions ─────────────────────────────────
+.env
+.env.*
+!.env.example
+**/.env
+**/.env.*
+!**/.env.example
+*service-account*.json
+sa.json
+
+# ── node ────────────────────────────────────────────────────────────────────
+node_modules/
+.next/
+out/
+dist/
+*.tsbuildinfo
+next-env.d.ts
+
+# ── python ──────────────────────────────────────────────────────────────────
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+artifacts/
+
+# ── tooling / os noise ──────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+.vercel/
+coverage/
+*.log
