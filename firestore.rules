@@ -1,0 +1,17 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Read-model mirror: PUBLIC reads (transparency is the product — the
+    // same data is on-chain), ZERO client writes. Only the Admin SDK (which
+    // bypasses rules) writes, from the server-side reconciler.
+    match /agreements/{id} { allow read: if true; allow write: if false; }
+    match /evaluations/{id} { allow read: if true; allow write: if false; }
+    match /evidence/{id} { allow read: if true; allow write: if false; }
+
+    // Server-internal — never client-readable.
+    match /siweNonces/{id} { allow read, write: if false; }
+    match /meta/{id} { allow read, write: if false; }
+
+    match /{document=**} { allow read, write: if false; }
+  }
+}
