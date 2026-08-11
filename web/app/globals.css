@@ -1,128 +1,150 @@
 @import "tailwindcss";
 
-/* ── GroundTruth design tokens — "site documents" (docs/UX.md §1).
-   Engineering-documentation feel: paper, graphite ink, safety orange.
-   Reference tokens by name; do not invent colors outside this vocabulary. ── */
+/* ── GroundTruth design tokens — ClickHouse-inspired system (DESIGN.md).
+   Near-pure black canvas, electric yellow as the single brand voltage,
+   Inter 700 displays with negative tracking, dark surface cards, no
+   shadows. Reference tokens by name; never inline hex in components. ── */
 :root {
-  --paper: #faf9f6;
-  --sheet: #ffffff;
-  --grid: #ececе7;
-  --grid-line: #ececde;
-  --grid-strong: #d6d4cc;
-  --ink: #21211d;
-  --ink-soft: #4a4a44;
-  --annotate: #85847c;
-  --accent: #e8500a;
-  --accent-deep: #9a3506;
-  --accent-soft: #fde8dc;
-  --verify: #1f6f43;
-  --verify-soft: #e2f0e8;
-  --hold: #8c8c85;
-  --hold-soft: #efeeea;
-  --refund: #8a4b0a;
-  --refund-soft: #f6ecdb;
-  --dispute: #7a2233;
-  --dispute-soft: #f5e3e7;
-  --on-dark: #faf9f6;
+  --primary: #faff69;
+  --primary-active: #e6eb52;
+  --primary-disabled: #3a3a1f;
+  --canvas: #0a0a0a;
+  --surface-soft: #121212;
+  --sheet: #1a1a1a;            /* surface-card */
+  --elevated: #242424;
+  --ink: #ffffff;              /* headline/primary text on dark */
+  --body: #cccccc;
+  --body-strong: #e6e6e6;
+  --annotate: #888888;         /* muted */
+  --muted-soft: #5a5a5a;
+  --grid-line: #2a2a2a;        /* hairline */
+  --grid-strong: #3a3a3a;      /* hairline-strong */
+  --on-primary: #0a0a0a;
+  --on-dark: #ffffff;
+
+  /* semantic (DESIGN.md accents) */
+  --verify: #22c55e;
+  --verify-soft: #12301c;
+  --dispute: #ef4444;
+  --dispute-soft: #351314;
+  --refund: #f59e0b;
+  --refund-soft: #33260d;
+  --hold: #888888;
+  --hold-soft: #242424;
+  --info: #3b82f6;
+
+  /* legacy aliases kept for the component tree */
+  --paper: #0a0a0a;
+  --accent: #faff69;
+  --accent-deep: #faff69;
+  --accent-soft: #3a3a1f;
+  --ink-soft: #cccccc;
 }
 
 @theme inline {
-  --color-paper: var(--paper);
+  --color-canvas: var(--canvas);
   --color-sheet: var(--sheet);
   --color-ink: var(--ink);
-  --color-accent: var(--accent);
-  --font-sans: var(--font-inter), Arial, sans-serif;
-  --font-display: var(--font-archivo), Arial, sans-serif;
+  --color-primary: var(--primary);
+  --font-sans: var(--font-inter), -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-mono: var(--font-plex-mono), ui-monospace, monospace;
 }
 
-html { background: var(--paper); color: var(--ink); }
+html { background: var(--canvas); color: var(--body); }
 body {
-  font-family: var(--font-inter), Arial, sans-serif;
+  font-family: var(--font-inter), -apple-system, "Segoe UI", Roboto, sans-serif;
   font-size: 16px;
-  line-height: 1.45;
+  line-height: 1.55;
   -webkit-font-smoothing: antialiased;
 }
 
-/* ── type scale — Archivo display, mono for every number ── */
-.g-display-xl { font-family: var(--font-archivo); font-size: 52px; font-weight: 600; line-height: 1.02; letter-spacing: -0.01em; }
-.g-display-lg { font-family: var(--font-archivo); font-size: 38px; font-weight: 600; line-height: 1.05; }
-.g-display-md { font-family: var(--font-archivo); font-size: 28px; font-weight: 600; line-height: 1.1; }
-.g-display-sm { font-family: var(--font-archivo); font-size: 21px; font-weight: 600; line-height: 1.15; }
-.g-body-lg { font-size: 18px; line-height: 1.4; }
-.g-caption { font-size: 14px; line-height: 1.5; color: var(--ink-soft); }
-.g-annotate { font-size: 12px; line-height: 1.4; color: var(--annotate); }
+/* ── type scale — Inter 700 displays, negative tracking (the system rule) ── */
+.g-display-xl { font-size: 64px; font-weight: 700; line-height: 1.05; letter-spacing: -2.2px; color: var(--ink); }
+.g-display-lg { font-size: 48px; font-weight: 700; line-height: 1.1; letter-spacing: -1.8px; color: var(--ink); }
+.g-display-md { font-size: 34px; font-weight: 700; line-height: 1.15; letter-spacing: -1.2px; color: var(--ink); }
+.g-display-sm { font-size: 24px; font-weight: 700; line-height: 1.25; letter-spacing: -0.4px; color: var(--ink); }
+.g-title-md { font-size: 18px; font-weight: 600; line-height: 1.4; color: var(--ink); }
+.g-body-lg { font-size: 17.5px; line-height: 1.55; color: var(--body); }
+.g-caption { font-size: 14px; line-height: 1.55; color: var(--body); }
+.g-annotate { font-size: 12.5px; line-height: 1.45; color: var(--annotate); }
 .g-eyebrow {
-  font-family: var(--font-plex-mono); font-size: 11px; font-weight: 500;
-  letter-spacing: 0.14em; text-transform: uppercase; color: var(--annotate);
+  font-size: 12px; font-weight: 600; letter-spacing: 1.5px;
+  text-transform: uppercase; color: var(--annotate);
 }
-.g-mono { font-family: var(--font-plex-mono); font-variant-numeric: tabular-nums; }
+.g-stat { font-size: 44px; font-weight: 700; line-height: 1.0; letter-spacing: -1.5px; color: var(--primary); }
+.g-mono { font-family: var(--font-plex-mono), ui-monospace, monospace; font-variant-numeric: tabular-nums; }
 
 @media (max-width: 767px) {
-  .g-display-xl { font-size: 34px; }
-  .g-display-lg { font-size: 28px; }
-  .g-display-md { font-size: 23px; }
+  .g-display-xl { font-size: 36px; letter-spacing: -1.2px; }
+  .g-display-lg { font-size: 30px; letter-spacing: -1px; }
+  .g-display-md { font-size: 25px; letter-spacing: -0.7px; }
+  .g-stat { font-size: 32px; }
 }
 
-/* ── title block: drawing-set section header (eyebrow + rule) ── */
-.g-titleblock { border-bottom: 2px solid var(--ink); padding-bottom: 8px; }
+/* legacy alias — some components use g-titleblock as a section header rule */
+.g-titleblock { border-bottom: 1px solid var(--grid-strong); padding-bottom: 12px; }
 
-/* ── survey-grid band (bands only — never behind data tables) ── */
-.g-band-grid {
-  background-color: var(--paper);
-  background-image:
-    linear-gradient(var(--grid-line) 1px, transparent 1px),
-    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
-  background-size: 32px 32px;
-}
-.g-band-ink { background: var(--ink); color: var(--on-dark); }
+/* ── bands: alternate surface modes, never two alike in a row ── */
+.g-band-grid { background: var(--canvas); }
+.g-band-ink { background: var(--surface-soft); color: var(--body); border-top: 1px solid var(--grid-line); }
+.g-band-yellow { background: var(--primary); color: var(--on-primary); border-radius: 12px; }
 
-/* ── cards: flat documentation surfaces, 12px, 1px grid border ── */
-.g-card { background: var(--sheet); border: 1px solid var(--grid-line); border-radius: 12px; padding: 20px; }
-.g-card-paper { background: var(--paper); border: 1px solid var(--grid-strong); border-radius: 12px; padding: 20px; }
+/* ── cards: dark surfaces, hairline, 12px, NO shadows ── */
+.g-card { background: var(--sheet); border: 1px solid var(--grid-line); border-radius: 12px; padding: 24px; }
+.g-card-paper { background: var(--surface-soft); border: 1px solid var(--grid-line); border-radius: 12px; padding: 24px; }
+.g-card-elevated { background: var(--elevated); border-radius: 8px; }
 
-/* ── buttons: 44px, 4px radius, mono-tracked uppercase ── */
+/* ── buttons: 40px, 8px radius, Inter 14/600 — yellow is the voltage ── */
 .g-btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-  height: 44px; padding: 12px 22px; border-radius: 4px;
-  font-family: var(--font-plex-mono); font-size: 13px; font-weight: 600;
-  letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer;
+  height: 40px; padding: 12px 20px; border-radius: 8px;
+  font-size: 14px; font-weight: 600; line-height: 1; cursor: pointer;
   white-space: nowrap; border: 1px solid transparent;
   transition: background-color 120ms ease, border-color 120ms ease, color 120ms ease;
 }
 .g-btn:disabled { cursor: not-allowed; }
-.g-btn-ink { background: var(--ink); color: var(--on-dark); }
-.g-btn-ink:hover:not(:disabled) { background: #000; }
-.g-btn-ink:disabled { background: var(--grid-strong); color: var(--sheet); }
-.g-btn-accent { background: var(--accent); color: var(--on-dark); }
-.g-btn-accent:hover:not(:disabled) { background: #cf4708; }
-.g-btn-accent:disabled { background: var(--grid-strong); }
-.g-btn-outline { background: transparent; color: var(--ink); border-color: var(--ink); }
+.g-btn-accent { background: var(--primary); color: var(--on-primary); }
+.g-btn-accent:hover:not(:disabled) { background: var(--primary-active); }
+.g-btn-accent:disabled { background: var(--primary-disabled); color: var(--annotate); }
+.g-btn-ink { background: var(--sheet); color: var(--on-dark); border-color: var(--grid-strong); }
+.g-btn-ink:hover:not(:disabled) { background: var(--elevated); }
+.g-btn-ink:disabled { color: var(--muted-soft); }
+.g-btn-outline { background: transparent; color: var(--on-dark); border-color: var(--grid-strong); }
 .g-btn-outline:hover:not(:disabled) { background: var(--sheet); }
-.g-btn-outline:disabled { color: var(--grid-strong); border-color: var(--grid-strong); }
-.g-btn-sm { height: 34px; padding: 6px 14px; font-size: 12px; }
+.g-btn-outline:disabled { color: var(--muted-soft); border-color: var(--grid-line); }
+.g-btn-sm { height: 34px; padding: 8px 14px; font-size: 13px; }
 
-.g-link { color: var(--accent-deep); font-weight: 500; }
+.g-link { color: var(--primary); font-weight: 500; }
 .g-link:hover { text-decoration: underline; }
 
-/* ── pills ── */
+/* ── pills / badges ── */
 .g-pill {
   display: inline-flex; align-items: center; gap: 6px;
-  border-radius: 8px; padding: 3px 10px;
+  border-radius: 9999px; padding: 4px 12px;
   font-size: 12.5px; font-weight: 500; line-height: 1.4;
 }
-.g-pill-outline { border: 1px solid var(--ink); color: var(--ink); background: transparent; }
-
-/* ── inputs ── */
-.g-input, .g-textarea {
-  width: 100%; background: var(--sheet); color: var(--ink);
-  border: 1px solid var(--grid-strong); border-radius: 4px;
-  padding: 12px 14px; font-size: 15px; outline: none;
+.g-pill-outline { border: 1px solid var(--grid-strong); color: var(--body-strong); background: transparent; }
+.g-pill-yellow {
+  background: var(--primary); color: var(--on-primary);
+  font-size: 11.5px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase;
 }
-.g-input { height: 44px; }
+
+/* ── inputs: dark, 8px radius, yellow focus ── */
+.g-input, .g-textarea {
+  width: 100%; background: var(--sheet); color: var(--on-dark);
+  border: 1px solid var(--grid-strong); border-radius: 8px;
+  padding: 10px 14px; font-size: 15px; outline: none;
+}
+.g-input { height: 40px; }
 .g-textarea { min-height: 96px; resize: vertical; }
-.g-input:focus, .g-textarea:focus { border-color: var(--ink); }
-.g-label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--ink-soft); }
+.g-input:focus, .g-textarea:focus { border-color: var(--primary); }
+.g-input::placeholder, .g-textarea::placeholder { color: var(--muted-soft); }
+.g-label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--body-strong); }
+
+/* range sliders on dark */
+input[type="range"] { accent-color: var(--primary); }
+input[type="checkbox"] { accent-color: var(--primary); }
+input[type="date"] { color-scheme: dark; }
 
 /* ── sha256 specimen stamp ── */
 .g-stamp {
@@ -131,36 +153,44 @@ body {
 }
 
 /* ── table ── */
-.g-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.g-table { width: 100%; border-collapse: collapse; font-size: 14px; color: var(--body); }
 .g-table th {
-  text-align: left; font-family: var(--font-plex-mono); font-size: 11px;
-  font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase;
-  color: var(--annotate); padding: 8px 12px; border-bottom: 2px solid var(--ink);
+  text-align: left; font-size: 11.5px; font-weight: 600; letter-spacing: 1.2px;
+  text-transform: uppercase; color: var(--annotate);
+  padding: 8px 12px; border-bottom: 1px solid var(--grid-strong);
 }
 .g-table td { padding: 11px 12px; border-bottom: 1px solid var(--grid-line); vertical-align: top; }
 
-/* ── skeletons: shaped like the real components ── */
+/* ── code window (the ClickHouse signature artifact) ── */
+.g-code-window {
+  background: var(--sheet); border: 1px solid var(--grid-line); border-radius: 12px;
+  padding: 24px; font-family: var(--font-plex-mono); font-size: 13px;
+  line-height: 1.6; color: var(--body); overflow-x: auto;
+}
+.g-code-window .tok-key { color: var(--info); }
+.g-code-window .tok-str { color: var(--primary); }
+.g-code-window .tok-num { color: var(--verify); }
+.g-code-window .tok-dim { color: var(--muted-soft); }
+
+/* ── skeletons ── */
 .g-skeleton {
-  background: linear-gradient(90deg, var(--grid-line) 25%, var(--paper) 50%, var(--grid-line) 75%);
+  background: linear-gradient(90deg, var(--sheet) 25%, var(--elevated) 50%, var(--sheet) 75%);
   background-size: 200% 100%; animation: g-shimmer 1.4s infinite; border-radius: 6px;
 }
 @keyframes g-shimmer { to { background-position: -200% 0; } }
-@media (prefers-reduced-motion: reduce) {
-  .g-skeleton { animation: none; }
-}
+@media (prefers-reduced-motion: reduce) { .g-skeleton { animation: none; } }
 
 /* ── toast ── */
 .g-toast {
   position: fixed; bottom: 24px; right: 24px; z-index: 60;
   width: 380px; max-width: calc(100vw - 32px);
-  background: var(--sheet); border: 1px solid var(--grid-strong);
-  border-radius: 12px; padding: 16px 18px;
-  box-shadow: 0 8px 24px rgba(33, 33, 29, 0.14);
+  background: var(--elevated); border: 1px solid var(--grid-strong);
+  border-radius: 12px; padding: 16px 18px; color: var(--body);
 }
 
-/* ── a11y: focus visible everywhere ── */
+/* ── a11y: yellow focus ring everywhere ── */
 .g-btn:focus-visible, .g-link:focus-visible, .g-input:focus-visible,
 .g-textarea:focus-visible, a:focus-visible, button:focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--primary);
   outline-offset: 2px;
 }

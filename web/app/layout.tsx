@@ -1,17 +1,12 @@
 import type { Metadata } from "next";
-import { Archivo, Inter, IBM_Plex_Mono } from "next/font/google";
+import { Inter, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
-
-const archivo = Archivo({
-  variable: "--font-archivo",
-  subsets: ["latin"],
-  weight: ["500", "600", "700"],
-});
+import Providers from "./providers";
 
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
-  weight: ["400", "500", "600"],
+  weight: ["400", "500", "600", "700"],
 });
 
 const plexMono = IBM_Plex_Mono({
@@ -31,10 +26,8 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body
-        className={`${archivo.variable} ${inter.variable} ${plexMono.variable} antialiased`}
-      >
-        {children}
+      <body className={`${inter.variable} ${plexMono.variable} antialiased`}>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );
