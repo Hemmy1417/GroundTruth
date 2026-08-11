@@ -12,15 +12,16 @@ settles. One primitive: **define → evidence → judgment → consensus →
 
 ## Status
 
-**Live on StudioNet:** `0x5D35a58B2e5e131F837D70Fe0CcC8901772435A9` (v0.1.0).
-judge-standard-hardened; the contract lands in Phase 5.
+**Live on GenLayer StudioNet** — `0x5D35a58B2e5e131F837D70Fe0CcC8901772435A9`
+(v0.1.0). 75 direct tests + 30 web tests green, genvm-lint clean, deployed
+bytecode byte-matches source. Next: production integration + the live demo.
 
 | | |
 |---|---|
-| Contract | `contract/groundtruth.py` — GenLayer intelligent contract (Phase 5) |
+| Contract | `contract/groundtruth.py` — GenLayer intelligent contract (14 writes, 8 views) |
 | Web | `web/` — Next.js App Router · Vercel · wallet auth (EIP-6963 + SIWE) |
 | Read-model | Firestore, written only by server routes reconciling from chain |
-| Docs | `docs/ARCHITECTURE.md` (incl. S1–S17 compliance matrix) · `docs/UX.md` |
+| Docs | `ARCHITECTURE` (S1–S17 matrix) · `UX` · `SECURITY` · `DEPLOYMENT` · `DEMO` |
 
 ## Design decisions (short version)
 
