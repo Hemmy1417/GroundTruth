@@ -12,7 +12,7 @@ describe("settlement table v1", () => {
   it("at/above threshold → full release", () => {
     for (const bucket of [90, 95, 100]) {
       const s = settlementPreview(amount, bucket, 9000, 6000);
-      expect(s).toEqual({ payee: amount, payer: 0n, rule: "FULL_RELEASE" });
+      expect(s).toEqual({ payee: amount, payer: 0n, keeper: 0n, rule: "FULL_RELEASE" });
     }
   });
 
@@ -26,7 +26,7 @@ describe("settlement table v1", () => {
 
   it("below floor → full refund", () => {
     const s = settlementPreview(amount, 55, 9000, 6000);
-    expect(s).toEqual({ payee: 0n, payer: amount, rule: "REFUND" });
+    expect(s).toEqual({ payee: 0n, payer: amount, keeper: 0n, rule: "REFUND" });
   });
 
   it("floor = 0 disables partial: anything below threshold refunds", () => {
@@ -43,7 +43,22 @@ describe("settlement table v1", () => {
   it("conserves every wei across the whole bucket range", () => {
     for (let bucket = 0; bucket <= 100; bucket += 5) {
       const s = settlementPreview(amount, bucket, 9000, 6000);
-      expect(s.payee + s.payer).toBe(amount);
+      expect(s.payee + s.payer + s.keeper).toBe(amount);
     }
+  });
+});
+
+describe("keeper bounty", () => {
+  it("comes off escrow first; the rule splits the remainder; every wei conserved", () => {
+    const s = settlementPreview(amount, 60, 9000, 6000, 50); // 0.5% keeper
+    expect(s.keeper).toBe((amount * 50n) / 10000n);
+    const pool = amount - s.keeper;
+    expect(s.payee).toBe((pool * 6000n) / 10000n);
+    expect(s.payee + s.payer + s.keeper).toBe(amount);
+  });
+
+  it("keeperBps = 0 is exactly the keeper-less table", () => {
+    const s = settlementPreview(amount, 95, 9000, 6000, 0);
+    expect(s).toEqual({ payee: amount, payer: 0n, keeper: 0n, rule: "FULL_RELEASE" });
   });
 });

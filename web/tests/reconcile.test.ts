@@ -10,11 +10,14 @@ function agreement(id: number, state: AgreementView["state"] = "FUNDED"): Agreem
     title: `Agreement ${id}`, question: "Done?", metric: "completion",
     threshold_bps: 9000, floor_bps: 6000, deadline: 1_800_000_000,
     sources: ["https://a.example"], amount_atto: "3000000000000000000",
+    project_tag: "Harborview Tower",
     state, created_at: 1_790_000_000, evaluation_ids: [], latest_eval_id: 0,
     dispute: { state: "NONE", challenger: "", statement: "", bond_atto: "0",
       filed_at: 0, reassess_eval_id: 0, window_ends: 0, terminal_at: 0 },
-    settlement: { settled: false, payee_atto: "0", payer_atto: "0", rule: "",
-      policy_version: 1, settled_at: 0 },
+    settlement: { settled: false, payee_atto: "0", payer_atto: "0",
+      keeper_atto: "0", rule: "", policy_version: 1, settled_at: 0 },
+    proposal: { id: 0, kind: "NONE", proposed_by: "", payee_bps: 0,
+      new_deadline: 0, proposed_at: 0 },
   };
 }
 

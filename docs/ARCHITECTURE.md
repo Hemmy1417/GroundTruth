@@ -76,6 +76,11 @@ One engine, no special cases.
         create_agreement (payer funds in the same tx)
                  │
                  ▼
+             PROPOSED ── payee assent required: the evidence list binds them.
+                 │        payer may cancel_proposed → CANCELLED (full refund)
+        accept_agreement (payee)
+                 │
+                 ▼
               FUNDED ◄────────────────┐
                  │                     │ INCONCLUSIVE / ERROR
         evaluate (permissionless,      │ (no state change, cooldown, retry)
@@ -127,6 +132,29 @@ judgment question AND the settlement gate, not merely stored.
 challenge window; settle is callable strictly *after* it. The two predicates
 are the same clock comparison negated — there is no instant where both
 succeed, so a challenge cannot race a settle at the edge.
+
+### Lifecycle additions (Phase-4 review; all two-party-consent, none unilateral)
+
+- **Negotiated settlement** — either party may propose a split (payee share
+  in bps of escrow); the counterparty accepts → SETTLED with rule
+  `NEGOTIATED`, no panel. A newer proposal from either side replaces the
+  open one; acceptance must match the exact proposal it accepts (id-checked,
+  no bait-and-switch). Available in FUNDED / ARMED / DISPUTED — settling out
+  of court is legal right up until the gavel. This is the arbitration thesis
+  itself: the credible threat of the panel is what makes honest negotiation
+  rational.
+- **Mutual deadline extension** — either party proposes a new (later)
+  deadline; the counterparty accepts → deadline moves. Construction overruns
+  are normal, not disputes. Both-consent means no unilateral window-moving
+  (S1 stays intact).
+- **Keeper bounty** — a deterministic protocol-level cut (config
+  `keeper_bounty_bps` of escrow, small) is paid to whoever executes the
+  final `settle`. Agreements become self-executing: nobody has to remember,
+  and monitoring agents earn by closing them. The bounty is storage-read,
+  never LLM-produced (S7-safe), and paid once from escrow before the split.
+- **Project tag** — an optional creation-time string; the frontend groups
+  agreements into tranched projects ("Harborview Tower — Milestones 1–3").
+  Pure metadata; no contract logic reads it.
 
 ## 4. Judgment & equivalence (S7 discipline)
 
