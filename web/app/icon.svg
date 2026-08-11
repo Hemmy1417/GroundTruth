@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- GroundTruth mark: the gauge needle at the threshold — the judged
+       completion level crossing into release. -->
+  <rect width="32" height="32" rx="7" fill="#0A0A0A"/>
+  <!-- track -->
+  <rect x="5" y="19" width="22" height="4" rx="2" fill="#232323"/>
+  <!-- release zone (right of threshold) -->
+  <rect x="21" y="19" width="6" height="4" rx="2" fill="#3A3A1F"/>
+  <!-- threshold tick -->
+  <path d="M21 15.5 L23.4 15.5 L22.2 18 Z" fill="#FCFF74" opacity="0.55"/>
+  <!-- the needle: judged level, crossing the track into release -->
+  <rect x="20.6" y="7" width="3.2" height="19" rx="1.6" fill="#FCFF74"/>
+</svg>
