@@ -1,11 +1,10 @@
 import Link from "next/link";
-import { Wordmark } from "@/components/shell";
+import { MarketingShell, CtaBand } from "@/components/marketing";
 
 /**
- * Landing — ClickHouse-style structure: black canvas, 7/5 hero with the
- * judgment as the code-window artifact (the judgment IS our query), yellow
- * stat callouts (honest protocol facts, no fabricated numbers), alternating
- * surface bands, yellow CTA band before a dark footer.
+ * Home — focused: 7/5 hero with the judgment code-window, honest stat
+ * callouts, the primitive in three cards, and page link-outs. Depth lives on
+ * /how-it-works, /trust, and /demo.
  */
 
 function JudgmentWindow() {
@@ -15,7 +14,7 @@ function JudgmentWindow() {
         <span className="w-2.5 h-2.5 rounded-full" style={{ background: "var(--dispute)" }} />
         <span className="w-2.5 h-2.5 rounded-full" style={{ background: "var(--refund)" }} />
         <span className="w-2.5 h-2.5 rounded-full" style={{ background: "var(--verify)" }} />
-        <span className="ml-2 text-[11.5px]">get_evaluation(7) — agreement #3, judged under consensus</span>
+        <span className="ml-2 text-[11.5px]">get_evaluation(7) — judged under consensus</span>
       </div>
       <pre className="whitespace-pre-wrap">
 {`{
@@ -36,25 +35,9 @@ function JudgmentWindow() {
   );
 }
 
-export default function Landing() {
+export default function Home() {
   return (
-    <div style={{ background: "var(--canvas)" }}>
-      {/* top nav */}
-      <header
-        className="h-16 flex items-center justify-between px-6"
-        style={{ borderBottom: "1px solid var(--grid-line)" }}
-      >
-        <Wordmark />
-        <nav className="hidden md:flex items-center gap-6 text-[14px]" style={{ color: "var(--body)" }}>
-          <Link href="/agreements" className="hover:text-white">Docket</Link>
-          <Link href="/settings" className="hover:text-white">Settings</Link>
-          <span className="g-pill g-pill-outline">STUDIONET</span>
-        </nav>
-        <Link href="/new" className="g-btn g-btn-accent g-btn-sm">
-          Get started
-        </Link>
-      </header>
-
+    <MarketingShell>
       {/* hero — 7/5 split */}
       <section className="max-w-[1280px] mx-auto px-6 py-24">
         <div className="grid lg:grid-cols-12 gap-10 items-center">
@@ -73,8 +56,8 @@ export default function Landing() {
               <Link href="/new" className="g-btn g-btn-accent">
                 Define a milestone
               </Link>
-              <Link href="/agreements" className="g-btn g-btn-ink">
-                Browse the docket
+              <Link href="/how-it-works" className="g-btn g-btn-ink">
+                How it works
               </Link>
             </div>
           </div>
@@ -99,152 +82,86 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* problem band — surface-soft */}
-      <section style={{ background: "var(--surface-soft)", borderTop: "1px solid var(--grid-line)", borderBottom: "1px solid var(--grid-line)" }}>
+      {/* the primitive — 3-up dark cards, each linking deeper */}
+      <section
+        style={{
+          background: "var(--surface-soft)",
+          borderTop: "1px solid var(--grid-line)",
+          borderBottom: "1px solid var(--grid-line)",
+        }}
+      >
         <div className="max-w-[1280px] mx-auto px-6 py-20">
-          <div className="max-w-[720px]">
-            <div className="g-eyebrow mb-3">The problem</div>
-            <h2 className="g-display-md">
-              “Release the money when the building is structurally complete”
-              is easy to write and hard to execute.
-            </h2>
-            <p className="g-caption mt-4">
-              Smart contracts can hold the money but cannot read an inspection
-              registry. Banks and escrow agents can read it — for a fee, on
-              their schedule, with their discretion. The condition that decides
-              the payment lives in the real world: progress reports,
-              registries, certificates — ambiguous, conflicting, occasionally
-              forged. Someone has to <em style={{ color: "var(--body-strong)" }}>judge</em> it.
-            </p>
+          <div className="g-eyebrow mb-6">One deep primitive</div>
+          <div className="grid md:grid-cols-3 gap-4">
+            {[
+              [
+                "01 · Define & escrow",
+                "Condition, deadline, release threshold, partial floor, evidence sources — frozen by mutual assent. The payer funds; the payee signs on; nobody holds keys.",
+                "/how-it-works",
+              ],
+              [
+                "02 · Judge & show",
+                "Validators fetch the sources, sanitize, hash, and judge the completion level. Every field the money reads is agreed under consensus.",
+                "/trust",
+              ],
+              [
+                "03 · Dispute & settle",
+                "One bonded challenge; a second panel re-judges the RECORDED dossier. Then a versioned table splits the escrow — no model authors an amount.",
+                "/trust",
+              ],
+            ].map(([t, d, href]) => (
+              <Link key={t} href={href!} className="g-card block" style={{ padding: 32 }}>
+                <div className="g-title-md">{t}</div>
+                <p className="g-caption mt-2.5">{d}</p>
+                <span className="g-link text-[13.5px] mt-3 inline-block">Read more →</span>
+              </Link>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* the primitive — 3-up dark cards */}
+      {/* demo teaser */}
       <section className="max-w-[1280px] mx-auto px-6 py-20">
-        <div className="g-eyebrow mb-6">One deep primitive</div>
-        <div className="grid md:grid-cols-3 gap-4">
-          {[
-            ["01 · Define & escrow", "Condition, deadline, release threshold, partial floor, evidence sources — frozen by mutual assent. The payer funds; the payee signs on; nobody holds keys."],
-            ["02 · Judge & show", "Validators fetch the sources, sanitize, hash, and judge the completion level. Every field the money reads is agreed under consensus; hashes bind the judged bytes."],
-            ["03 · Dispute & settle", "One bonded challenge; a second panel re-judges the RECORDED dossier. Then a versioned table splits the escrow — no model ever authors an amount."],
-          ].map(([t, d]) => (
-            <div key={t} className="g-card" style={{ padding: 32 }}>
-              <div className="g-title-md">{t}</div>
-              <p className="g-caption mt-2.5">{d}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* threshold-native — yellow feature card + gauge sketch */}
-      <section className="max-w-[1280px] mx-auto px-6 pb-20">
         <div className="grid lg:grid-cols-2 gap-4 items-stretch">
           <div className="g-band-yellow" style={{ padding: 32 }}>
-            <div
-              className="g-eyebrow mb-2"
-              style={{ color: "rgba(10,10,10,0.6)" }}
-            >
-              Threshold-native
+            <div className="g-eyebrow mb-2" style={{ color: "rgba(10,10,10,0.6)" }}>
+              Flagship demo
             </div>
             <h2 className="g-display-sm" style={{ color: "var(--on-primary)" }}>
-              Real projects aren&apos;t done / not-done.
+              Harborview Tower — release 3 GEN at 90% structural completion.
             </h2>
             <p className="mt-3 text-[14.5px]" style={{ color: "rgba(10,10,10,0.8)", lineHeight: 1.55 }}>
-              Every agreement is a judged completion level against a release
-              threshold and an optional partial floor: full release at the
-              threshold, pro-rata in between, refund below. Binary YES/NO is
-              just threshold = 100%. Early completion pays early; an early miss
-              is provisional — “not yet” is not “failed”.
+              Three acts: 60% judged provisional, 95% satisfied then challenged
+              (“the inspection was preliminary”), and a certified final that
+              settles for real. Every act runs the production machinery.
             </p>
-          </div>
-          <div className="g-card" style={{ padding: 32 }}>
-            <div className="g-eyebrow mb-4">The deal&apos;s shape</div>
-            <div className="relative" style={{ height: 56 }}>
-              <div className="absolute left-0 right-0 top-4 flex overflow-hidden rounded" style={{ height: 14 }}>
-                <div style={{ width: "60%", background: "var(--refund-soft)" }} />
-                <div style={{ width: "30%", background: "var(--accent-soft)" }} />
-                <div style={{ flex: 1, background: "var(--verify-soft)" }} />
-              </div>
-              <div className="absolute" style={{ left: "60%", top: 0, width: 2, height: 34, background: "var(--grid-strong)" }} />
-              <div className="absolute" style={{ left: "90%", top: 0, width: 2, height: 34, background: "var(--primary)" }} />
-              <div className="absolute g-mono g-annotate" style={{ top: 38, left: "60%", transform: "translateX(-50%)" }}>△ 60</div>
-              <div className="absolute g-mono" style={{ top: 38, left: "90%", transform: "translateX(-50%)", fontSize: 11, color: "var(--primary)" }}>▲ 90</div>
-            </div>
-            <p className="g-annotate mt-5">
-              “Release 3 GEN at 90% structural completion, pro-rata above
-              60%.” Judged 75%? The table pays 2.24 to the payee, refunds the
-              rest — deterministically.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* honesty + dispute — 2-up on soft band */}
-      <section style={{ background: "var(--surface-soft)", borderTop: "1px solid var(--grid-line)" }}>
-        <div className="max-w-[1280px] mx-auto px-6 py-20 grid md:grid-cols-2 gap-4">
-          <div className="g-card" style={{ padding: 32 }}>
-            <div className="g-eyebrow mb-2">Consensus, shown honestly</div>
-            <p className="g-caption">
-              Every field the money reads — verdict, completion bucket,
-              evidence sufficiency — is pinned inside validator equivalence:
-              independent validators re-run the whole fetch-and-judge task and
-              must agree on each one. Advisory fields are labeled advisory.
-              Evidence is fetched by the contract itself, delimiter-sanitized,
-              and hash-bound. No validator counts are ever invented.
-            </p>
-          </div>
-          <div className="g-card" style={{ padding: 32 }}>
-            <div className="g-eyebrow mb-2">Built to be fought</div>
-            <p className="g-caption">
-              Either party can challenge a verdict inside the window with a
-              1 GEN bond and new evidence, snapshotted at filing. A second
-              panel judges the RECORDED dossier — not a refetch, so nobody can
-              fix the surface after the ruling. Unresolved disputes have a
-              permissionless terminal escape; uncertainty never forfeits a
-              bond. And most fights should end before the panel: propose a
-              split, the other side accepts, done.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* yellow CTA band */}
-      <section className="max-w-[1280px] mx-auto px-6 py-20">
-        <div className="g-band-yellow text-center" style={{ padding: 64 }}>
-          <h2 className="g-display-md" style={{ color: "var(--on-primary)" }}>
-            Put money on what actually happens.
-          </h2>
-          <div className="mt-6 flex justify-center gap-3 flex-wrap">
             <Link
-              href="/new"
-              className="g-btn"
+              href="/demo"
+              className="g-btn mt-5"
               style={{ background: "var(--canvas)", color: "var(--on-dark)" }}
             >
-              Define a milestone
+              Walk the demo
             </Link>
-            <Link
-              href="/agreements"
-              className="g-btn"
-              style={{ border: "1px solid rgba(10,10,10,0.4)", color: "var(--on-primary)" }}
-            >
-              See live agreements
+          </div>
+          <div className="g-card" style={{ padding: 32 }}>
+            <div className="g-eyebrow mb-4">Why GenLayer</div>
+            <p className="g-caption">
+              A deterministic contract cannot read an inspection registry. A
+              single AI backend could — but then one company&apos;s model
+              decides who gets paid. GenLayer sits exactly in the gap:
+              independent validators each run the judgment and must agree on
+              every decisive field before state can change. The escrow makes
+              the judgment load-bearing; the deterministic table keeps money
+              out of the model&apos;s hands.
+            </p>
+            <Link href="/trust" className="g-link text-[13.5px] mt-3 inline-block">
+              The full trust model →
             </Link>
           </div>
         </div>
       </section>
 
-      {/* footer */}
-      <footer style={{ borderTop: "1px solid var(--grid-line)" }}>
-        <div className="max-w-[1280px] mx-auto px-6 py-12 flex flex-wrap items-center justify-between gap-4">
-          <Wordmark />
-          <div className="g-annotate" style={{ color: "var(--muted-soft)" }}>
-            Prototype of evidence-settled escrow on GenLayer StudioNet.
-            Financial parameters are experimental — not legal or underwriting
-            standards.
-          </div>
-        </div>
-      </footer>
-    </div>
+      <CtaBand title="Put money on what actually happens." />
+    </MarketingShell>
   );
 }
