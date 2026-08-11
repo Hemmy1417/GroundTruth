@@ -9,6 +9,7 @@ import { MarketingShell, PageHero } from "@/components/marketing";
 
 const ACTS: {
   n: string;
+  act: number;
   title: string;
   world: string;
   machine: string;
@@ -17,6 +18,7 @@ const ACTS: {
 }[] = [
   {
     n: "Act 1",
+    act: 1,
     title: "60% — provisional, nothing moves",
     world:
       "The monthly progress report reads 60% structural completion; the building-control registry shows no completion inspection on record.",
@@ -30,6 +32,7 @@ const ACTS: {
   },
   {
     n: "Act 2",
+    act: 2,
     title: "95% — satisfied, then challenged",
     world:
       "The report reaches 95% with an engineer's inspection note; the registry says the note is PRELIMINARY — certificate pending. A lender's audit note argues the milestone should not count until certification is lodged.",
@@ -44,6 +47,7 @@ const ACTS: {
   },
   {
     n: "Act 3",
+    act: 3,
     title: "Certified — settles for real",
     world:
       "The final inspection passes with the independent checker's countersignature; the certificate is lodged at building control. The registry reads CERTIFIED.",
@@ -109,6 +113,12 @@ export default function Demo() {
                   </a>
                 ))}
               </div>
+              <Link
+                href={`/new?demo=harborview&act=${act.act}`}
+                className="g-btn g-btn-ink g-btn-sm mt-4"
+              >
+                Recreate this act
+              </Link>
             </div>
             <div className="lg:col-span-4">
               <div className="g-eyebrow mb-1.5">The world says</div>

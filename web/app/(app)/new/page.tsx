@@ -19,26 +19,54 @@ import { dateInputToEpoch, formatEpoch, parseGen, pct } from "@/lib/format";
 
 const STEPS = ["Condition", "Money", "Evidence", "Review & fund"] as const;
 
+/**
+ * Optional URL prefill (?demo=harborview&act=1|2|3) — the /demo page's
+ * "recreate the demo" links land here with the whole Harborview agreement
+ * filled in. Read once at mount from window.location (client-only page; no
+ * Suspense/searchParams machinery needed).
+ */
+function initialForm() {
+  if (typeof window === "undefined") return null;
+  const q = new URLSearchParams(window.location.search);
+  if (q.get("demo") !== "harborview") return null;
+  const act = ["1", "2", "3"].includes(q.get("act") ?? "") ? q.get("act") : "1";
+  const origin = window.location.origin;
+  const in30d = new Date(Date.now() + 30 * 86400_000);
+  return {
+    title: `Harborview Tower — Milestone 3 (act ${act})`,
+    question:
+      "Has Harborview Tower reached certified structural completion per the building-control registry?",
+    metric: "structural completion percentage",
+    deadline: in30d.toISOString().slice(0, 10),
+    projectTag: "Harborview Tower",
+    amount: "3",
+    threshold: 90,
+    floor: 60,
+    sourcesText: `${origin}/api/demo/harborview/progress?act=${act}\n${origin}/api/demo/harborview/inspection?act=${act}`,
+  };
+}
+
 export default function NewAgreementPage() {
   const { address, client } = useWallet();
   const { run, tx } = useTx();
   const router = useRouter();
   const [step, setStep] = useState(0);
+  const [prefill] = useState(initialForm);
 
   // condition
-  const [title, setTitle] = useState("");
-  const [question, setQuestion] = useState("");
-  const [metric, setMetric] = useState("");
-  const [deadline, setDeadline] = useState("");
-  const [projectTag, setProjectTag] = useState("");
+  const [title, setTitle] = useState(prefill?.title ?? "");
+  const [question, setQuestion] = useState(prefill?.question ?? "");
+  const [metric, setMetric] = useState(prefill?.metric ?? "");
+  const [deadline, setDeadline] = useState(prefill?.deadline ?? "");
+  const [projectTag, setProjectTag] = useState(prefill?.projectTag ?? "");
   // money
   const [payee, setPayee] = useState("");
-  const [amount, setAmount] = useState("1");
-  const [threshold, setThreshold] = useState(90);
+  const [amount, setAmount] = useState(prefill?.amount ?? "1");
+  const [threshold, setThreshold] = useState(prefill?.threshold ?? 90);
   const [floorOn, setFloorOn] = useState(true);
-  const [floor, setFloor] = useState(60);
+  const [floor, setFloor] = useState(prefill?.floor ?? 60);
   // evidence
-  const [sourcesText, setSourcesText] = useState("");
+  const [sourcesText, setSourcesText] = useState(prefill?.sourcesText ?? "");
 
   const amountAtto = parseGen(amount) ?? 0n;
   const deadlineEpoch = deadline ? dateInputToEpoch(deadline) : 0;
