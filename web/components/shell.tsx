@@ -30,11 +30,11 @@ export function LogoMark({ size = 22 }: { size?: number }) {
       aria-hidden
       style={{ borderRadius: size * 0.22, flexShrink: 0 }}
     >
-      <rect width="32" height="32" rx="7" fill="#0A0A0A" />
-      <rect x="5" y="19" width="22" height="4" rx="2" fill="#2A2A2A" />
-      <rect x="21" y="19" width="6" height="4" rx="2" fill="#3A3A1F" />
-      <path d="M21 15.5 L23.4 15.5 L22.2 18 Z" fill="#FCFF74" opacity="0.55" />
-      <rect x="20.6" y="7" width="3.2" height="19" rx="1.6" fill="#FCFF74" />
+      <rect width="32" height="32" rx="7" fill="#FCFF74" />
+      <rect x="5" y="19" width="22" height="4" rx="2" fill="#0A0A0A" opacity="0.16" />
+      <rect x="21" y="19" width="6" height="4" rx="2" fill="#0A0A0A" opacity="0.34" />
+      <path d="M21 15.5 L23.4 15.5 L22.2 18 Z" fill="#0A0A0A" opacity="0.55" />
+      <rect x="20.6" y="7" width="3.2" height="19" rx="1.6" fill="#0A0A0A" />
     </svg>
   );
 }
