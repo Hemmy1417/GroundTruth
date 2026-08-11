@@ -12,7 +12,7 @@ settles. One primitive: **define → evidence → judgment → consensus →
 
 ## Status
 
-Phase 3 (repository scaffold). Architecture and UX are specified and
+**Live on StudioNet:** `0x5D35a58B2e5e131F837D70Fe0CcC8901772435A9` (v0.1.0).
 judge-standard-hardened; the contract lands in Phase 5.
 
 | | |

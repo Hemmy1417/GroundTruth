@@ -27,7 +27,7 @@ pytestmark = pytest.mark.skipif(
 @pytest.fixture(scope="module")
 def live():
     factory = get_contract_factory("GroundTruth")
-    return factory.build_contract(address=ADDRESS)
+    return factory.build_contract(contract_address=ADDRESS)
 
 
 def test_config_reads_and_matches_protocol(live):
