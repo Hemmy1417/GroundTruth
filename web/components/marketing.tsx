@@ -180,7 +180,7 @@ export function CtaBand({ title }: { title: string }) {
           <Link
             href="/agreements"
             className="g-btn"
-            style={{ border: "1px solid rgba(10,10,10,0.4)", color: "var(--on-primary)" }}
+            style={{ border: "1px solid rgba(255,255,255,0.55)", color: "var(--on-primary)" }}
           >
             See live agreements
           </Link>

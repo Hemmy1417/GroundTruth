@@ -289,7 +289,10 @@ a { color: inherit; text-decoration: none; }
 .g-label { display: block; font-size: 13.5px; font-weight: 500; color: var(--ink); margin-bottom: 7px; }
 .g-link { color: var(--accent); font-weight: 500; }
 .g-link:hover { color: var(--accent-2); }
-.g-code-window { background: var(--ink); color: var(--on-dark); border-radius: var(--r-card); padding: var(--s5); font-family: var(--font-mono); font-size: 12.5px; line-height: 1.7; overflow-x: auto; }
+/* Fixed dark panel in BOTH themes — the pastel syntax tokens below are tuned
+   for a dark background; keying it to var(--ink) inverted it to near-white in
+   dark mode and washed the tokens out. Code panels are conventionally dark. */
+.g-code-window { background: #14151a; color: #e8e8e5; border-radius: var(--r-card); padding: var(--s5); font-family: var(--font-mono); font-size: 12.5px; line-height: 1.7; overflow-x: auto; }
 .g-code-window .tok-key { color: #a5b4fc; } .g-code-window .tok-str { color: #86efac; } .g-code-window .tok-num { color: #fca5a5; } .g-code-window .tok-dim { color: #6b7280; }
 .g-pill-yellow { background: var(--accent-bg); color: var(--accent-2); }
 .g-stamp { font-family: var(--font-mono); font-size: 11px; color: var(--muted); border: 1px dashed var(--line-2); border-radius: 6px; padding: 2px 7px; }

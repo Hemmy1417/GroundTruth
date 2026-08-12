@@ -216,10 +216,11 @@ well control one (a contractor's own progress page). Four defenses, layered:
 1. **Mutual assent, frozen** — the payer's funding transaction is on-chain
    approval of the exact source list; it cannot change afterward (only a
    dispute can introduce new sources, hashed at filing).
-2. **Integrity-bound at every read** — each evaluation hashes what it judged;
-   the dispute panel reads the RECORDED dossier (S14), integrity-checking the
-   stored excerpt against its on-chain hash before judging, and separately
-   re-fetches to make post-ruling edits *visible* as tampering signals.
+2. **Integrity-bound at the boundary** — each evaluation hashes exactly the
+   bytes it fetched, at fetch time, and stores the excerpt + its sha256 on-chain;
+   the dispute panel then judges those RECORDED on-chain excerpts (S14) — the
+   tamper-proof record, not a live refetch used as evidence — and *separately*
+   re-fetches only to make post-ruling edits *visible* as tampering signals.
 3. **Source-nature weighing in the prompt** — the panel is instructed that
    self-published party sources carry less evidentiary weight than
    independent ones (registries, inspection records), and that
@@ -232,15 +233,18 @@ well control one (a contractor's own progress page). Four defenses, layered:
 ## 5b. Consensus wall-clock (S13)
 
 Every window (deadline, challenge, stale-dispute terminal, cooldown) anchors
-on the portfolio's two-source consensus clock — Cloudflare `/cdn-cgi/trace` +
-Ethereum block time — with the **asymmetric divergence guard** (the fixed
-ClaimSense version; the symmetric guard froze timed methods in 13 earlier
-contracts when an explorer's indexer lagged). Honest semantics, stated in the
-README too (S12): *up to* two sources, cross-checked when both answer; one
-live source is trusted; zero live sources → the clock reads 0 and every
-window **fails closed** (nothing settles, nothing forfeits). Windows armed
-while the clock was down get a **self-healing anchor**: the deadline is set
-on the first successful clock read after arming, never activity-counted.
+on the portfolio's multi-source consensus clock — three `/cdn-cgi/trace`
+sources (Cloudflare, DigitalOcean, Medium) cross-checked against each other,
+plus an Ethereum block-time floor — with the **asymmetric divergence guard**
+(the fixed ClaimSense version; the symmetric guard froze timed methods in 13
+earlier contracts when an explorer's indexer lagged). Honest semantics, stated
+in the README too (S12): *up to* three sources, cross-checked when at least two
+answer, with the chain block time as a one-directional floor; one live source
+is trusted; zero live sources → the clock reads 0 and every window **fails
+closed** (nothing settles, nothing forfeits). Arming itself requires a live
+clock — the arming path reads the clock and reverts when it is down — so a
+window can never be armed against a dead clock; its challenge deadline is
+anchored to that live read, never activity-counted.
 
 ## 6. Consensus visualization (honesty contract)
 
@@ -303,8 +307,8 @@ balance), the repo-level signed-write test (S6), genvm-lint in CI.
 | S10 | indexed views only |
 | S11 | direct + adversarial + wei-conservation + signed-write suites, CI |
 | S12 | advisory badges; public-on-chain statements never called sealed; honest clock language; demo honesty statement |
-| S13 | two-source wall-clock, asymmetric guard, fail-closed, self-healing anchors |
-| S14 | dispute panel judges the recorded dossier, digest-verified before reading |
+| S13 | multi-source wall-clock (3 cross-checked cdn sources + Ethereum-block floor), asymmetric guard, fail-closed, arming requires a live clock |
+| S14 | dispute panel judges the on-chain RECORDED excerpts (not a live refetch); a fresh refetch is included only to surface post-ruling edits |
 | S15 | single funding path; single challenge path; challenge/settle boundary race excluded by construction |
 | S16 | validated ruling struct with coherence rules before any state read |
 | S17 | stale-dispute terminal escape (permissionless, wall-clock, defined rule: original verdict stands, bond refunded) + EXPIRED refund path |

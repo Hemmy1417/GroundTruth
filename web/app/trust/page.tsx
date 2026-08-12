@@ -130,7 +130,7 @@ export default function Trust() {
             ],
             [
               "Strict windows, no races",
-              "Challenge is valid strictly inside the 72-hour window; settle strictly after it. The two predicates are the same clock comparison negated — there is no instant where both succeed. The clock itself is two independent sources with a divergence guard; when it's down, everything fails closed.",
+              "Challenge is valid strictly inside the 72-hour window; settle strictly after it. The two predicates are the same clock comparison negated — there is no instant where both succeed. The clock itself is three independent time sources cross-checked against each other, plus a chain-block floor; when it's down, everything fails closed.",
             ],
             [
               "A dispute can never trap funds",

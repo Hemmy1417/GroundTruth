@@ -127,7 +127,7 @@ before the first build — `NEXT_PUBLIC_*` are baked in at build time):
 | `NEXT_PUBLIC_FIREBASE_PROJECT_ID` | your project id | realtime mirror |
 | `NEXT_PUBLIC_FIREBASE_APP_ID` | Firebase web-app config | realtime mirror |
 | `FIREBASE_SERVICE_ACCOUNT_B64` | base64 of service-account JSON | mirror writes (Admin SDK) |
-| `DEMO_ADMIN_TOKEN` | any long random string | owner-only demo act switching (optional) |
+| `DEMO_ADMIN_TOKEN` | any long random string | reserved for future demo-admin gating — **not currently enforced** (demo acts are read-only static content switched by a public `?act` param); safe to omit |
 
 ```bash
 # SESSION_SECRET

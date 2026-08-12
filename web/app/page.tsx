@@ -124,13 +124,13 @@ export default function Home() {
       <section className="max-w-[1280px] mx-auto px-6 py-20">
         <div className="grid lg:grid-cols-2 gap-4 items-stretch">
           <div className="g-band-yellow" style={{ padding: 32 }}>
-            <div className="g-eyebrow mb-2" style={{ color: "rgba(10,10,10,0.6)" }}>
+            <div className="g-eyebrow mb-2" style={{ color: "rgba(255,255,255,0.85)" }}>
               Flagship demo
             </div>
             <h2 className="g-display-sm" style={{ color: "var(--on-primary)" }}>
               Harborview Tower — release 3 GEN at 90% structural completion.
             </h2>
-            <p className="mt-3 text-[14.5px]" style={{ color: "rgba(10,10,10,0.8)", lineHeight: 1.55 }}>
+            <p className="mt-3 text-[14.5px]" style={{ color: "rgba(255,255,255,0.92)", lineHeight: 1.55 }}>
               Three acts: 60% judged provisional, 95% satisfied then challenged
               (“the inspection was preliminary”), and a certified final that
               settles for real. Every act runs the production machinery.

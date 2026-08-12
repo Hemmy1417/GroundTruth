@@ -97,7 +97,7 @@ is hostile or dead.
 | Source flood / oversized page / dead exhibit URLs | caps + truncation-at-hash + UNREACHABLE recorded, non-fatal |
 | Replay a SIWE message | nonce consumed atomically before signature work — dies |
 | Sign in for the wrong chain / forged signer | chainId pinned; recovered address compared — 401 |
-| Wrong-state calls on all 14 methods | every gate probed; ledger asserted unmoved |
+| Wrong-state calls on all 13 write methods | every gate probed; ledger asserted unmoved |
 | Second panel returns incoherent ruling | reverts; dispute stays FILED (retryable); bond safe |
 
 ## Residual risks — stated honestly

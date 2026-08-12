@@ -7,7 +7,7 @@
  */
 import { useConfig, useStats } from "@/lib/hooks";
 import { useWallet } from "@/lib/wallet";
-import { CHAIN_RPC_DIRECT, CONTRACT_ADDRESS, CONTRACT_CONFIGURED, EXPLORER_URL } from "@/lib/chain/config";
+import { CONTRACT_ADDRESS, CONTRACT_CONFIGURED, EXPLORER_URL } from "@/lib/chain/config";
 import { FIREBASE_ENABLED } from "@/lib/firebase";
 import { formatGen, pct, shortAddr } from "@/lib/format";
 import { ConnectButton } from "@/components/shell";

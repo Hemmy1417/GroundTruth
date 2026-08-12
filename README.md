@@ -18,7 +18,7 @@ bytecode byte-matches source. Next: production integration + the live demo.
 
 | | |
 |---|---|
-| Contract | `contract/groundtruth.py` — GenLayer intelligent contract (14 writes, 8 views) |
+| Contract | `contract/groundtruth.py` — GenLayer intelligent contract (13 writes, 7 views) |
 | Web | `web/` — Next.js App Router · Vercel · wallet auth (EIP-6963 + SIWE) |
 | Read-model | Firestore, written only by server routes reconciling from chain |
 | Docs | `ARCHITECTURE` (S1–S17 matrix) · `UX` · `SECURITY` · `DEPLOYMENT` · `DEMO` |
