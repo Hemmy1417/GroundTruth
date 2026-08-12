@@ -1,17 +1,28 @@
 "use client";
 
 /**
- * The Docket — every agreement, public. Grouped by project tag when present;
- * the connected wallet's agreements are flagged. Fully readable walletless.
+ * Agreements — the docket as a calm list. One primary action (New agreement),
+ * a light summary strip, then scannable rows: title + parties on the left,
+ * amount + status on the right. Grouped by project when tagged. Fully
+ * readable without a wallet.
  */
 import Link from "next/link";
 import { useMemo } from "react";
 import { useDocket, useMyAgreementIds, useStats } from "@/lib/hooks";
 import { useWallet } from "@/lib/wallet";
 import { formatEpoch, formatGen, pct, shortAddr } from "@/lib/format";
-import { StateChip } from "@/components/badges";
-import { EmptyState, SkeletonCard, StatTile, TitleBlock } from "@/components/ui";
+import { Badge, EmptyState, Skeleton } from "@/components/kit";
 import { CONTRACT_CONFIGURED } from "@/lib/chain/config";
+
+const STATE_TONE: Record<string, { tone: "success" | "warning" | "danger" | "pending" | "neutral"; label: string }> = {
+  PROPOSED: { tone: "pending", label: "Awaiting assent" },
+  FUNDED: { tone: "pending", label: "Active" },
+  ARMED: { tone: "pending", label: "Challenge window" },
+  DISPUTED: { tone: "danger", label: "Disputed" },
+  SETTLED: { tone: "success", label: "Settled" },
+  EXPIRED: { tone: "warning", label: "Expired" },
+  CANCELLED: { tone: "neutral", label: "Cancelled" },
+};
 
 export default function DocketPage() {
   const { address } = useWallet();
@@ -21,12 +32,7 @@ export default function DocketPage() {
   const myIds = useMemo(() => new Set(mine.data?.agreement_ids ?? []), [mine.data]);
 
   if (!CONTRACT_CONFIGURED) {
-    return (
-      <EmptyState
-        title="Contract not configured"
-        body="This build has no NEXT_PUBLIC_CONTRACT_ADDRESS set. Once GroundTruth is deployed to StudioNet and the address configured, the docket runs against live chain state."
-      />
-    );
+    return <EmptyState title="Contract not configured" body="No contract address is set for this build. Once GroundTruth is deployed and configured, the docket runs against live chain state." />;
   }
 
   const items = docket.data?.agreements ?? [];
@@ -38,91 +44,71 @@ export default function DocketPage() {
   }
 
   return (
-    <div>
-      <TitleBlock
-        eyebrow="Public record"
-        title="The docket"
-        right={
-          <Link href="/new" className="g-btn g-btn-accent g-btn-sm">
-            New agreement
-          </Link>
-        }
-      />
-
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-        <StatTile label="Agreements" value={stats.data?.agreements ?? "—"} />
-        <StatTile
-          label="Escrow held"
-          value={stats.data ? `${formatGen(stats.data.escrow_held_atto)} GEN` : "—"}
-        />
-        <StatTile
-          label="Settled to date"
-          value={stats.data ? `${formatGen(stats.data.settled_total_atto)} GEN` : "—"}
-        />
-        <StatTile label="Judgments" value={stats.data?.evaluations ?? "—"} />
+    <div className="sections">
+      {/* header + primary action */}
+      <div className="flex items-end justify-between gap-4 flex-wrap">
+        <div>
+          <h1 className="t-title">Agreements</h1>
+          <p className="t-body mt-1">Every escrow settled on verified evidence — public, on-chain.</p>
+        </div>
+        <Link href="/new" className="btn btn-primary">New agreement</Link>
       </div>
 
+      {/* quiet summary strip — three numbers, not fifteen */}
+      <div className="grid grid-cols-3 gap-6" style={{ borderTop: "1px solid var(--line)", borderBottom: "1px solid var(--line)", padding: "var(--s5) 0" }}>
+        <Summary label="Agreements" value={stats.data ? String(stats.data.agreements) : undefined} />
+        <Summary label="In escrow" value={stats.data ? `${formatGen(stats.data.escrow_held_atto)} GEN` : undefined} />
+        <Summary label="Settled" value={stats.data ? `${formatGen(stats.data.settled_total_atto)} GEN` : undefined} />
+      </div>
+
+      {/* the list */}
       {docket.isLoading ? (
-        <div className="grid gap-3">
-          <SkeletonCard />
-          <SkeletonCard />
-        </div>
+        <div className="stack-s">{[0, 1, 2].map((i) => <Skeleton key={i} h={68} />)}</div>
       ) : items.length === 0 ? (
-        <EmptyState
-          title="No agreements yet"
-          body="Define a real-world condition, escrow the money against it, and let the evidence decide."
-          action={
-            <Link href="/new" className="g-btn g-btn-ink">
-              Create the first agreement
-            </Link>
-          }
-        />
+        <EmptyState title="No agreements yet" body="Define a real-world condition, escrow the money against it, and let the evidence decide." action={<Link href="/new" className="btn btn-primary">Create the first agreement</Link>} />
       ) : (
-        <div className="grid gap-6">
+        <div className="stack">
           {[...groups.entries()].map(([tag, rows]) => (
             <div key={tag || "untagged"}>
-              {tag ? (
-                <div className="g-eyebrow mb-2">
-                  Project — {tag} · {rows.length} milestone{rows.length > 1 ? "s" : ""}
-                </div>
-              ) : null}
-              <div className="grid gap-2.5">
-                {rows.map((a) => (
-                  <Link
-                    key={a.id}
-                    href={`/agreements/${a.id}`}
-                    className="g-card block hover:border-[var(--ink)]"
-                    style={{ borderWidth: 1 }}
-                  >
-                    <div className="flex items-center justify-between gap-3 flex-wrap">
-                      <div className="min-w-0">
-                        <div className="font-semibold text-[15.5px] truncate">
-                          #{a.id} — {a.title}
+              {tag ? <div className="t-label mb-3">{tag} · {rows.length} milestone{rows.length > 1 ? "s" : ""}</div> : null}
+              <div style={{ borderTop: "1px solid var(--line)" }}>
+                {rows.map((a) => {
+                  const st = STATE_TONE[a.state] ?? STATE_TONE.PROPOSED!;
+                  return (
+                    <Link key={a.id} href={`/agreements/${a.id}`} className="flex items-center justify-between gap-4"
+                      style={{ padding: "var(--s4) var(--s2)", borderBottom: "1px solid var(--line)", transition: "background 120ms ease", borderRadius: 8 }}
+                      onMouseEnter={(e) => (e.currentTarget.style.background = "var(--surface-2)")}
+                      onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}>
+                      <div style={{ minWidth: 0 }}>
+                        <div className="flex items-center gap-2">
+                          <span className="t-h3" style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{a.title}</span>
+                          {myIds.has(a.id) ? <span className="badge badge-outline" style={{ height: 20, fontSize: 11 }}>Yours</span> : null}
                         </div>
-                        <div className="g-annotate g-mono mt-0.5">
-                          {shortAddr(a.payer)} ⇄ {shortAddr(a.payee)} · release at{" "}
-                          {pct(a.threshold_bps)} · deadline {formatEpoch(a.deadline)}
+                        <div className="t-meta mt-0.5">
+                          {shortAddr(a.payer)} → {shortAddr(a.payee)} · release {pct(a.threshold_bps)} · {formatEpoch(a.deadline)}
                         </div>
                       </div>
-                      <div className="flex items-center gap-2.5 shrink-0">
-                        {myIds.has(a.id) ? (
-                          <span className="g-pill g-pill-outline" style={{ fontSize: 11 }}>
-                            YOURS
-                          </span>
-                        ) : null}
-                        <span className="g-mono font-semibold">
-                          {formatGen(a.amount_atto)} GEN
-                        </span>
-                        <StateChip state={a.state} />
+                      <div className="flex items-center gap-4 shrink-0">
+                        <span className="t-num" style={{ fontSize: 15 }}>{formatGen(a.amount_atto)} <span className="t-meta">GEN</span></span>
+                        <Badge tone={st.tone} dot>{st.label}</Badge>
                       </div>
-                    </div>
-                  </Link>
-                ))}
+                    </Link>
+                  );
+                })}
               </div>
             </div>
           ))}
         </div>
       )}
+    </div>
+  );
+}
+
+function Summary({ label, value }: { label: string; value?: string }) {
+  return (
+    <div>
+      <div className="t-label">{label}</div>
+      {value ? <div className="t-num t-num-lg mt-1">{value}</div> : <Skeleton h={26} w={80} className="mt-2" />}
     </div>
   );
 }

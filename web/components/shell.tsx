@@ -1,11 +1,9 @@
 "use client";
 
 /**
- * App shell — dark CONSOLE layout: fixed left sidebar (wordmark, nav,
- * network/wallet at the bottom), main content right. NO gate —
- * transparency is the product: every read renders without a wallet; the
- * wallet gates only actions. (Deliberately different structure from the
- * portfolio's top-bar apps.)
+ * App shell — a calm top bar: wordmark, two nav links, one wallet control.
+ * No sidebar, no clutter. Transparency is the product: reads render without
+ * a wallet; the wallet gates only actions.
  */
 import Link from "next/link";
 import { useState } from "react";
@@ -15,114 +13,75 @@ import { shortAddr } from "@/lib/format";
 import { CONTRACT_CONFIGURED } from "@/lib/chain/config";
 
 const NAV = [
-  { href: "/agreements", label: "Docket", glyph: "≡" },
-  { href: "/new", label: "New agreement", glyph: "+" },
-  { href: "/settings", label: "Settings", glyph: "⚙" },
+  { href: "/agreements", label: "Agreements" },
+  { href: "/new", label: "New" },
 ];
 
-/** The mark: a gauge needle crossing the threshold into release. */
 export function LogoMark({ size = 22 }: { size?: number }) {
   return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 32 32"
-      aria-hidden
-      style={{ borderRadius: size * 0.22, flexShrink: 0 }}
-    >
-      <rect width="32" height="32" rx="7" fill="#FCFF74" />
-      <rect x="5" y="19" width="22" height="4" rx="2" fill="#0A0A0A" opacity="0.16" />
-      <rect x="21" y="19" width="6" height="4" rx="2" fill="#0A0A0A" opacity="0.34" />
-      <path d="M21 15.5 L23.4 15.5 L22.2 18 Z" fill="#0A0A0A" opacity="0.55" />
-      <rect x="20.6" y="7" width="3.2" height="19" rx="1.6" fill="#0A0A0A" />
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden>
+      <rect width="24" height="24" rx="7" fill="var(--accent)" />
+      <path d="M6.5 12.5l3.2 3.2 7-7" stroke="var(--on-accent)" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
 
-export function Wordmark({ compact = false }: { compact?: boolean }) {
+export function Wordmark() {
   return (
-    <Link href="/" className="inline-flex items-center gap-2">
-      <LogoMark size={compact ? 20 : 23} />
-      <span className="inline-flex items-baseline">
-        <span
-          className="font-bold"
-          style={{ color: "var(--ink)", fontSize: compact ? 16 : 18, letterSpacing: "-0.5px" }}
-        >
-          ground
-        </span>
-        <span
-          className="font-bold"
-          style={{ color: "var(--primary)", fontSize: compact ? 16 : 18, letterSpacing: "-0.5px" }}
-        >
-          truth
-        </span>
+    <Link href="/" className="flex items-center gap-2.5">
+      <LogoMark />
+      <span style={{ fontSize: 16.5, fontWeight: 600, letterSpacing: "-0.02em", color: "var(--ink)" }}>
+        GroundTruth
       </span>
     </Link>
   );
 }
 
-export function ConnectButton({ full = false }: { full?: boolean }) {
+export function ConnectButton({ block = false }: { block?: boolean }) {
   const { address, wallets, connect, connecting, disconnect } = useWallet();
   const [open, setOpen] = useState(false);
 
   if (address) {
     return (
-      <div className={full ? "grid gap-1.5" : "inline-flex items-center gap-2"}>
-        <span className="g-pill g-pill-outline g-mono">{shortAddr(address)}</span>
-        <button
-          className="g-link text-[13px] cursor-pointer text-left"
-          onClick={disconnect}
-        >
-          Disconnect
-        </button>
-      </div>
+      <button className={`badge badge-outline ${block ? "w-full" : ""}`} style={{ height: 38, cursor: "pointer" }} onClick={disconnect} title="Disconnect">
+        <span className="badge-dot" style={{ background: "var(--success)" }} />
+        <span className="t-mono" style={{ fontSize: 12.5 }}>{shortAddr(address)}</span>
+      </button>
     );
   }
   return (
     <div className="relative">
-      <button
-        className={`g-btn g-btn-accent g-btn-sm ${full ? "w-full" : ""}`}
-        onClick={() => setOpen((v) => !v)}
-      >
+      <button className={`btn btn-primary btn-sm ${block ? "btn-block" : ""}`} onClick={() => setOpen((v) => !v)}>
         Connect wallet
       </button>
       {open ? (
-        <div
-          className="absolute bottom-11 left-0 z-50 w-60 g-card"
-          style={{ background: "var(--elevated)" }}
-        >
-          <div className="g-eyebrow mb-2">Choose a wallet</div>
+        <div className="absolute right-0 mt-2 z-50" style={{ width: 280, background: "var(--surface)", border: "1px solid var(--line)", borderRadius: "var(--r-card)", boxShadow: "var(--shadow-lg)", padding: "var(--s4)" }}>
+          <div className="t-label mb-3">Choose a wallet</div>
           {wallets.length === 0 ? (
-            <p className="g-annotate">
-              No EVM wallet detected. Install MetaMask, Rainbow, or Zerion,
-              then reload.
-            </p>
+            <p className="t-small">No EVM wallet detected. Install MetaMask, Rainbow, or Zerion, then reload.</p>
           ) : (
-            <div className="grid gap-2">
+            <div className="stack-s">
               {wallets.map((w) => (
                 <button
                   key={w.info.uuid}
-                  className="g-btn g-btn-ink g-btn-sm w-full justify-between"
+                  className="btn btn-secondary btn-block"
+                  style={{ justifyContent: "space-between" }}
                   disabled={connecting}
-                  onClick={() => {
-                    void connect(w).then(() => setOpen(false));
-                  }}
+                  onClick={() => void connect(w).then(() => setOpen(false))}
                 >
-                  <span className="inline-flex items-center gap-2">
+                  <span className="flex items-center gap-2">
                     {w.info.icon ? (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={w.info.icon} alt="" className="w-4 h-4 rounded" />
+                      <img src={w.info.icon} alt="" width={18} height={18} style={{ borderRadius: 5 }} />
                     ) : null}
                     {w.info.name}
                   </span>
-                  <span className="g-annotate">{connecting ? "…" : "→"}</span>
+                  <span className="t-meta">{connecting ? "…" : "→"}</span>
                 </button>
               ))}
             </div>
           )}
-          <p className="g-annotate mt-2.5">
-            GroundTruth never holds keys — your wallet signs every action.
-          </p>
+          <p className="t-meta mt-3">GroundTruth never holds your keys.</p>
         </div>
       ) : null}
     </div>
@@ -131,97 +90,49 @@ export function ConnectButton({ full = false }: { full?: boolean }) {
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-
-  const nav = (
-    <nav className="grid gap-1">
-      {NAV.map((n) => {
-        const active = pathname?.startsWith(n.href);
-        return (
-          <Link
-            key={n.href}
-            href={n.href}
-            className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[14px] font-medium"
-            style={
-              active
-                ? { background: "var(--sheet)", color: "var(--ink)" }
-                : { color: "var(--annotate)" }
-            }
-          >
-            <span
-              aria-hidden
-              className="g-mono text-[13px] w-4 text-center"
-              style={{ color: active ? "var(--primary)" : "var(--muted-soft)" }}
-            >
-              {n.glyph}
-            </span>
-            {n.label}
-          </Link>
-        );
-      })}
-    </nav>
-  );
-
   return (
-    <div className="min-h-screen flex" style={{ background: "var(--canvas)" }}>
-      {/* sidebar — desktop */}
-      <aside
-        className="hidden md:flex flex-col justify-between w-[228px] shrink-0 sticky top-0 h-screen px-4 py-5"
-        style={{ borderRight: "1px solid var(--grid-line)" }}
-      >
-        <div>
-          <div className="px-3 mb-6">
+    <div style={{ minHeight: "100vh", background: "var(--bg)" }}>
+      <header style={{ position: "sticky", top: 0, zIndex: 40, background: "color-mix(in srgb, var(--bg) 86%, transparent)", backdropFilter: "blur(10px)", borderBottom: "1px solid var(--line)" }}>
+        <div className="wrap flex items-center justify-between" style={{ height: 60 }}>
+          <div className="flex items-center gap-7">
             <Wordmark />
+            <nav className="hidden sm:flex items-center gap-1">
+              {NAV.map((n) => {
+                const active = pathname?.startsWith(n.href);
+                return (
+                  <Link key={n.href} href={n.href} className="btn btn-ghost btn-sm" style={active ? { background: "var(--surface-2)", color: "var(--ink)" } : undefined}>
+                    {n.label}
+                  </Link>
+                );
+              })}
+            </nav>
           </div>
-          {nav}
-        </div>
-        <div className="grid gap-3 px-3">
-          {!CONTRACT_CONFIGURED && (
-            <span
-              className="g-pill"
-              style={{ background: "var(--dispute-soft)", color: "var(--dispute)" }}
-            >
-              contract not configured
-            </span>
-          )}
-          <span className="g-pill g-pill-outline w-fit" title="GenLayer StudioNet — a test network; GEN carries no real-world value.">
-            STUDIONET
-          </span>
-          <ConnectButton full />
-          <p className="g-annotate" style={{ color: "var(--muted-soft)" }}>
-            Evidence-settled escrow on GenLayer. Prototype — experimental
-            parameters.
-          </p>
-        </div>
-      </aside>
-
-      {/* mobile top bar */}
-      <div className="md:hidden fixed top-0 inset-x-0 z-40" style={{ background: "var(--canvas)", borderBottom: "1px solid var(--grid-line)" }}>
-        <div className="h-14 px-4 flex items-center justify-between">
-          <Wordmark compact />
-          <ConnectButton />
-        </div>
-        <div className="flex gap-1 px-3 pb-2 overflow-x-auto">
-          {NAV.map((n) => (
-            <Link
-              key={n.href}
-              href={n.href}
-              className="px-3 py-1.5 rounded-lg text-[13.5px] font-medium whitespace-nowrap"
-              style={
-                pathname?.startsWith(n.href)
-                  ? { background: "var(--sheet)", color: "var(--ink)" }
-                  : { color: "var(--annotate)" }
-              }
-            >
-              {n.label}
+          <div className="flex items-center gap-3">
+            {!CONTRACT_CONFIGURED ? <Badge>Not configured</Badge> : null}
+            <Link href="/settings" className="btn btn-ghost btn-sm hidden sm:inline-flex" style={pathname?.startsWith("/settings") ? { background: "var(--surface-2)", color: "var(--ink)" } : undefined}>
+              Settings
             </Link>
-          ))}
+            <ConnectButton />
+          </div>
         </div>
-      </div>
-
-      {/* main */}
-      <main className="flex-1 min-w-0 px-4 md:px-8 py-8 pt-28 md:pt-8 max-w-[1080px]">
+        <nav className="sm:hidden flex gap-1 wrap" style={{ paddingBottom: 8, overflowX: "auto" }}>
+          {[...NAV, { href: "/settings", label: "Settings" }].map((n) => {
+            const active = pathname?.startsWith(n.href);
+            return (
+              <Link key={n.href} href={n.href} className="btn btn-ghost btn-sm" style={active ? { background: "var(--surface-2)", color: "var(--ink)" } : undefined}>
+                {n.label}
+              </Link>
+            );
+          })}
+        </nav>
+      </header>
+      <main className="wrap" style={{ paddingTop: "var(--s7)", paddingBottom: "var(--s9)" }}>
         {children}
       </main>
     </div>
   );
+}
+
+function Badge({ children }: { children: React.ReactNode }) {
+  return <span className="badge badge-warning">{children}</span>;
 }
