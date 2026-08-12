@@ -1,13 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
   <!-- GroundTruth mark: the gauge needle at the threshold — the judged
-       completion level crossing into release. Yellow tile, ink needle. -->
-  <rect width="32" height="32" rx="7" fill="#FCFF74"/>
+       completion level crossing into release. Indigo tile, white gauge. -->
+  <rect width="32" height="32" rx="7" fill="#4f46e5"/>
   <!-- track -->
-  <rect x="5" y="19" width="22" height="4" rx="2" fill="#0A0A0A" opacity="0.16"/>
+  <rect x="5" y="19" width="22" height="4" rx="2" fill="#ffffff" opacity="0.28"/>
   <!-- release zone (right of threshold) -->
-  <rect x="21" y="19" width="6" height="4" rx="2" fill="#0A0A0A" opacity="0.34"/>
+  <rect x="21" y="19" width="6" height="4" rx="2" fill="#ffffff" opacity="0.5"/>
   <!-- threshold tick -->
-  <path d="M21 15.5 L23.4 15.5 L22.2 18 Z" fill="#0A0A0A" opacity="0.55"/>
+  <path d="M21 15.5 L23.4 15.5 L22.2 18 Z" fill="#ffffff" opacity="0.8"/>
   <!-- the needle: judged level, crossing the track into release -->
-  <rect x="20.6" y="7" width="3.2" height="19" rx="1.6" fill="#0A0A0A"/>
+  <rect x="20.6" y="7" width="3.2" height="19" rx="1.6" fill="#ffffff"/>
 </svg>

@@ -117,32 +117,34 @@ export default function HowItWorks() {
                 ▲ 90 release
               </div>
             </div>
-            <table className="g-table mt-8">
-              <thead>
-                <tr>
-                  <th>Judged completion</th>
-                  <th>Rule</th>
-                  <th>3 GEN escrow pays</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td className="g-mono">≥ 90%</td>
-                  <td>FULL RELEASE</td>
-                  <td className="g-mono">payee 2.985 (after 0.5% keeper)</td>
-                </tr>
-                <tr>
-                  <td className="g-mono">60–85%</td>
-                  <td>PRO RATA</td>
-                  <td className="g-mono">payee = bucket% of pool, rest refunds</td>
-                </tr>
-                <tr>
-                  <td className="g-mono">&lt; 60%</td>
-                  <td>REFUND</td>
-                  <td className="g-mono">payer 2.985, keeper 0.015</td>
-                </tr>
-              </tbody>
-            </table>
+            <div className="mt-8" style={{ overflowX: "auto" }}>
+              <table className="g-table" style={{ minWidth: 420 }}>
+                <thead>
+                  <tr>
+                    <th>Judged completion</th>
+                    <th>Rule</th>
+                    <th>3 GEN escrow pays</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td className="g-mono">≥ 90%</td>
+                    <td>FULL RELEASE</td>
+                    <td className="g-mono">payee 2.985 (after 0.5% keeper)</td>
+                  </tr>
+                  <tr>
+                    <td className="g-mono">60–85%</td>
+                    <td>PRO RATA</td>
+                    <td className="g-mono">payee = bucket% of pool, rest refunds</td>
+                  </tr>
+                  <tr>
+                    <td className="g-mono">&lt; 60%</td>
+                    <td>REFUND</td>
+                    <td className="g-mono">payer 2.985, keeper 0.015</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </section>

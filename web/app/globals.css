@@ -134,10 +134,10 @@ body {
 .divider { height: 1px; background: var(--line); border: 0; }
 
 /* quiet label→value rows (secondary info, no card) */
-.row { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s4); padding: var(--s3) 0; }
+.row { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s4); padding: var(--s3) 0; flex-wrap: wrap; }
 .row + .row { border-top: 1px solid var(--line); }
-.row-k { color: var(--muted); font-size: 14px; }
-.row-v { color: var(--ink); font-size: 14px; text-align: right; }
+.row-k { color: var(--muted); font-size: 14px; flex: none; }
+.row-v { color: var(--ink); font-size: 14px; text-align: right; min-width: 0; overflow-wrap: anywhere; }
 
 /* ── cards: used with purpose, soft, rarely nested ────────────────────────── */
 .card {

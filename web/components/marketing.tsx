@@ -173,7 +173,7 @@ export function CtaBand({ title }: { title: string }) {
           <Link
             href="/new"
             className="g-btn"
-            style={{ background: "var(--canvas)", color: "var(--on-dark)" }}
+            style={{ background: "#ffffff", color: "var(--ink)" }}
           >
             Define a milestone
           </Link>

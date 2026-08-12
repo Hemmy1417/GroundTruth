@@ -138,7 +138,7 @@ export default function Home() {
             <Link
               href="/demo"
               className="g-btn mt-5"
-              style={{ background: "var(--canvas)", color: "var(--on-dark)" }}
+              style={{ background: "#ffffff", color: "var(--ink)" }}
             >
               Walk the demo
             </Link>

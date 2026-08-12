@@ -17,11 +17,16 @@ const NAV = [
   { href: "/new", label: "New" },
 ];
 
-export function LogoMark({ size = 22 }: { size?: number }) {
+/** The mark (same as the favicon): a gauge needle crossing the threshold —
+ *  indigo tile, white gauge. Visible on any light header surface. */
+export function LogoMark({ size = 24 }: { size?: number }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden>
-      <rect width="24" height="24" rx="7" fill="var(--accent)" />
-      <path d="M6.5 12.5l3.2 3.2 7-7" stroke="var(--on-accent)" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round" />
+    <svg width={size} height={size} viewBox="0 0 32 32" aria-hidden style={{ flexShrink: 0 }}>
+      <rect width="32" height="32" rx="7" fill="var(--accent)" />
+      <rect x="5" y="19" width="22" height="4" rx="2" fill="#ffffff" opacity="0.28" />
+      <rect x="21" y="19" width="6" height="4" rx="2" fill="#ffffff" opacity="0.5" />
+      <path d="M21 15.5 L23.4 15.5 L22.2 18 Z" fill="#ffffff" opacity="0.8" />
+      <rect x="20.6" y="7" width="3.2" height="19" rx="1.6" fill="#ffffff" />
     </svg>
   );
 }

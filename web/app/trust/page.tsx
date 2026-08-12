@@ -149,7 +149,8 @@ export default function Trust() {
       <section className="max-w-[1280px] mx-auto px-6 pb-20">
         <div className="g-card" style={{ padding: 32 }}>
           <div className="g-eyebrow mb-4">Failure discipline — what happens when things break</div>
-          <table className="g-table">
+          <div style={{ overflowX: "auto" }}>
+          <table className="g-table" style={{ minWidth: 560 }}>
             <thead>
               <tr>
                 <th>Failure</th>
@@ -174,6 +175,7 @@ export default function Trust() {
               ))}
             </tbody>
           </table>
+          </div>
         </div>
       </section>
 
