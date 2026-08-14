@@ -13,8 +13,8 @@ settles. One primitive: **define → evidence → judgment → consensus →
 ## Status
 
 **Live: [groundtruth-gen.vercel.app](https://groundtruth-gen.vercel.app)** —
-contract `0x5D35a58B2e5e131F837D70Fe0CcC8901772435A9` (v0.1.0, GenLayer
-StudioNet). 75 direct tests + 30 web tests green, genvm-lint clean, deployed
+contract `0xc05383b8B70603bA4858c97673D5Cc313196c7AB` (v0.2.0, GenLayer
+StudioNet). 90 direct tests + 30 web tests green, genvm-lint clean, deployed
 bytecode byte-matches source. Full lifecycle proven on-chain — both dispute
 branches, a negotiated exit, and a mismatched-evidence refusal — tx hashes in
 `docs/DEPLOYMENT.md`.
@@ -27,7 +27,7 @@ Reading needs no wallet. The docket at
 | # | State | What you can do |
 |---|---|---|
 | 1 | **DISPUTED** — 1 GEN bond posted | Open the dispute room: panel 1's recorded dossier (SATISFIED @ 100), the bonded challenge citing an audit note, both evidence hashes. **Reassess is permissionless** — connect any funded StudioNet wallet and trigger the second panel yourself; the bond routes on-chain by the verdict. |
-| 2 | **ARMED** — challenge window open | Challenge it (exactly 1 GEN bond), or wait out the window and settle — the caller earns the 0.5% keeper bounty. |
+| 2 | **FUNDED** — awaiting judgment | Press **Request evaluation** and watch a validator panel fetch the registry and rule live. It arms a challenge window you can then contest or settle. |
 
 Or create your own: point a new agreement at a public evidence URL, accept
 from the payee wallet, request evaluation. Evidence the panel can't match to

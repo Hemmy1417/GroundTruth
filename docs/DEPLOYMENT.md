@@ -1,32 +1,84 @@
 # GroundTruth — Deployment
 
-## Deployment record — StudioNet (2026-08-11)
+## Deployment record — StudioNet (2026-08-14, v0.2.0)
 
 | | |
 |---|---|
-| Contract | `0x5D35a58B2e5e131F837D70Fe0CcC8901772435A9` |
-| Deploy tx | `0x51d056f8e8737a821b6a7accf8e7e7ea5ecb8fb358d8331bced135c06cb4d30e` |
-| Version | v0.1.0 |
-| Consensus | ACCEPTED — 3× AGREE |
+| Contract | `0xc05383b8B70603bA4858c97673D5Cc313196c7AB` |
+| Deploy tx | `0x7d9227eccfce462a945426c778117b42c84eda3c0291070dbf576cb0a1eb3970` |
+| Version | v0.2.0 — the third judge letter |
+| Consensus | ACCEPTED |
 | Deployer/owner | `0x10dbf82a8bb191bd1c082de5ef915e998aa5ccd7` |
 | Constructor | `eval_cooldown_seconds = 300` (demo cadence) |
 | Network | GenLayer StudioNet (chainId 61999), gasless |
 | Runner | pinned `py-genlayer:1jb45aa8…jpz09h6` |
 
-### Pre-deploy gate (all green)
-- `genvm-lint check groundtruth.py --json` → ok, 0 diagnostics
-- 75 direct tests pass (core · disputes · adversarial · hostile · security)
-- runner version hash pinned; no `:test`/`:latest`
+Supersedes v0.1.0 `0x5D35a58B2e5e131F837D70Fe0CcC8901772435A9`, which remains
+readable on-chain but is no longer served by the app.
+
+### What v0.2.0 changed (judge letter, 2026-08-14)
+
+> *"the stored dispute dossier is still leader-authored rather than
+> consensus-bound, and an evidence-insufficient NOT_SATISFIED result can still
+> move funds. Please bind recorded evidence to validator checks, force
+> insufficient judgments to remain inconclusive, and add focused tests."*
+
+- **Sufficiency gates every conclusive verdict.** v0.1 gated only `SATISFIED`,
+  so a panel could report `NOT_SATISFIED` while declaring its own evidence
+  insufficient, arm, and settle — pro-rata paying a payee on a level the
+  evidence could not establish, forfeiting a challenger's bond over an
+  admittedly unfounded finding, or refunding before the deadline. Any
+  non-INCONCLUSIVE verdict with `evidence_sufficient=false` is now coerced to
+  INCONCLUSIVE at bucket 0, inside the block validators compare, plus a
+  defense-in-depth refusal at the settle boundary.
+- **The dossier is consensus-bound.** Validators previously compared only the
+  judgment, so a dishonest leader could agree on the verdict and still write a
+  fabricated url/digest/excerpt into the permanent record a dispute panel
+  reads. Validators now compare the recorded array: row count, each row's URL
+  in order, the readability claim, and that each digest covers its own
+  excerpt. Excerpt *bytes* are deliberately not compared — two honest fetches
+  of a live page differ.
+- **The digest covers the bytes actually stored.** v0.1 hashed the full fetched
+  body but stored only a 1500-char excerpt, so the sha256 covered bytes nobody
+  could re-check. `reassess()` now re-verifies every digest before the second
+  panel reads a byte.
+- **The timing rule binds the second panel.** `reassess()` hardcoded
+  `provisional=False`, so a pre-deadline reversal to NOT_SATISFIED refunded
+  immediately; the DISPUTED/RESOLVED settle branch waits for no window, so
+  nothing downstream caught it.
+
+90 direct tests (up from 75), each fix mutation-checked: every one of 12
+deliberate breakages is caught by at least one test.
 
 ### Post-deploy verification
 - `get_config` reads clean: owner set, policy v1, challenge window 72h,
   dispute terminal 7d, cooldown 300s, bond 1 GEN, keeper 50 bps, max 4 sources.
-- `get_stats` reads clean: empty ledger (0 agreements, 0 escrow, 0 bonds).
-- **Deployed bytecode byte-for-byte matches local `groundtruth.py`** (55,581
-  bytes; `genlayer code` head/tail verified).
-- **Frontend read path verified**: the app's genlayer-js client
-  (`createClient({ chain: studionet })`) reads `get_config` / `get_stats` /
-  `list_agreements` against the live address correctly.
+- `get_stats` read clean on a fresh ledger before seeding.
+- **Deployed bytecode byte-for-byte matches local `groundtruth.py`.**
+
+### Judge-facing seed (live on this address)
+
+| # | Title | State | For the judge |
+|---|---|---|---|
+| 1 | Harborview Tower — Milestone 3 · certified completion | **DISPUTED / FILED**, 1 GEN bond held | The dispute is deliberately left open: `reassess` is permissionless, so any funded wallet can trigger the second panel and watch the bond route on-chain. |
+| 2 | Harborview Tower — Milestone 4 · final handover | **FUNDED** | `evaluate` is permissionless — press Request evaluation and watch a panel fetch the registry and rule live. |
+
+Seed transactions:
+
+```text
+create #1    0x053a225fef…f03fb0
+accept #1    0x565e38fa92…96a5b3
+evaluate #1  0x32f9970ab3…2fd938   -> SATISFIED @ 100%, sufficient=true -> ARMED
+create #2    0x7c8b83d0c7…04dd6d
+accept #2    0x6dd8939303…92bff0
+challenge #1 0xb20e7ae7f7…5e119b   -> DISPUTED, 1 GEN bond, audit-note exhibit
+```
+
+Escrow held 1.0 GEN, bonds held 1.0 GEN at seed time.
+
+Evidence pages: certified registry `https://paste.rs/Ztlzs` (status ISSUED),
+interim audit note `https://paste.rs/IZ7N6` (countersignature PENDING) — the
+conflict the second panel has to weigh.
 
 ### Deployment topology
 
@@ -118,7 +170,7 @@ before the first build — `NEXT_PUBLIC_*` are baked in at build time):
 
 | Var | Value | Needed for |
 |---|---|---|
-| `NEXT_PUBLIC_CONTRACT_ADDRESS` | `0x5D35a58B2e5e131F837D70Fe0CcC8901772435A9` | **required** (the live main contract) |
+| `NEXT_PUBLIC_CONTRACT_ADDRESS` | `0xc05383b8B70603bA4858c97673D5Cc313196c7AB` | **required** (the live main contract) |
 | `NEXT_PUBLIC_GENLAYER_RPC_URL` | `https://studio.genlayer.com/api` | has default |
 | `NEXT_PUBLIC_GENLAYER_CHAIN_ID` | `61999` | has default |
 | `GENLAYER_RPC_URL` | `https://studio.genlayer.com/api` | server proxy; has default |

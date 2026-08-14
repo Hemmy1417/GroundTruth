@@ -21,6 +21,7 @@ from .conftest import (
 )
 
 MAX_FETCH_CHARS = 12_000
+EXCERPT_CHARS = 1_500
 T_EVAL = T0 + 7200
 
 
@@ -141,8 +142,12 @@ def test_giant_page_truncated_and_hashed_at_cap(direct_vm, direct_deploy, direct
                             verdict="INCONCLUSIVE", bucket=0, sufficient=False)
     ev = eval_view(c, out["evaluation_id"])
     r = evidence_view(c, ev["evidence_ids"][0])
+    # `size` still reports how much was JUDGED (the cap), but the digest now
+    # covers exactly the bytes that were RECORDED — a hash over the full body
+    # could never be re-checked by anyone, because the body is not stored.
     assert r["size"] == MAX_FETCH_CHARS
-    assert r["sha256"] == hashlib.sha256(("A" * MAX_FETCH_CHARS).encode()).hexdigest()
+    assert r["sha256"] == hashlib.sha256(("A" * EXCERPT_CHARS).encode()).hexdigest()
+    assert r["sha256"] == hashlib.sha256(r["excerpt"].encode()).hexdigest()
 
 
 # ── prompt contract ──────────────────────────────────────────────────────────
@@ -221,6 +226,9 @@ def test_full_arc_conserves_every_wei(direct_vm, direct_deploy, direct_owner, di
     mock_reassessment(direct_vm, verdict="NOT_SATISFIED", bucket=60)
     direct_vm.sender = direct_bob
     c.reassess(aid)
+    # the reversal lands before the deadline, so it is provisional — the
+    # arc completes once the deadline makes it conclusive
+    mock_clock(direct_vm, DEADLINE + 60)
     direct_vm.sender = direct_alice
     s = json.loads(c.settle(aid))
     a = agreement_view(c, aid)

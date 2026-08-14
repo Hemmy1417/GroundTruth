@@ -1,4 +1,4 @@
-# v0.1.0
+# v0.2.0
 # { "Depends": "py-genlayer:1jb45aa8ynh2a9c9xn3b7qqh8sm5q93hwfp7jqmwsfhh8jpz09h6" }
 
 # NOTE: the blank line above is load-bearing — GenVM parses the leading
@@ -169,6 +169,18 @@ def _validate_judgment(j: dict, threshold_bps: int) -> dict:
     # coherence: an agreed-upon contradiction is still a contradiction
     if verdict == "SATISFIED" and not sufficient:
         raise gl.vm.UserError(f"{ERROR_LLM} SATISFIED without sufficient evidence")
+    # SUFFICIENCY GATES *EVERY* CONCLUSIVE VERDICT, not just the positive one.
+    # A panel that reports NOT_SATISFIED while declaring the evidence
+    # insufficient has not found non-completion — it has failed to establish
+    # anything, and that is INCONCLUSIVE by this contract's own failure rule.
+    # Left ungated it settled: pro-rata paid a payee on a level the evidence
+    # could not support, an upheld dispute forfeited the challenger's bond
+    # over an admittedly unfounded finding, and a reassessment could refund
+    # before the deadline. Coerced here, inside the block whose output
+    # validators compare, so every validator coerces identically.
+    if not sufficient and verdict != "INCONCLUSIVE":
+        verdict = "INCONCLUSIVE"
+        bucket = 0                      # nothing was established
     if verdict == "SATISFIED" and bucket * 100 < threshold_bps:
         raise gl.vm.UserError(f"{ERROR_LLM} SATISFIED below threshold is incoherent")
     if verdict == "NOT_SATISFIED" and bucket * 100 >= threshold_bps:
@@ -400,16 +412,22 @@ class GroundTruth(gl.Contract):
     def _fetch_source(self, url: str, now: int) -> dict:
         """The truncated body is DELIMITER-SANITIZED ('<<<' can never appear
         inside evidence, so a hostile page cannot close its own block and
-        forge sources), THEN hashed — the hash binds exactly the judged
-        bytes (S8); the excerpt preserves the judged record on-chain (S14)."""
+        forge sources), THEN the RECORDED excerpt is hashed.
+
+        The digest covers exactly the bytes that go on-chain, so any later
+        panel can re-verify the record it is judging (S14). Hashing the full
+        judged body instead would produce a digest nobody can ever check —
+        the body is not stored — while `size` still reports how much was
+        judged, so the record never overstates what it preserves."""
         try:
             raw = gl.nondet.web.render(url, mode="text")
             body = (raw if isinstance(raw, str) else str(raw))[:MAX_FETCH_CHARS]
             body = body.replace("<<<", "‹‹‹")
+            excerpt = body[:EXCERPT_CHARS]
             return {
-                "url": url, "status": "OK", "sha256": _sha256(body),
+                "url": url, "status": "OK", "sha256": _sha256(excerpt),
                 "size": len(body), "body": body,
-                "excerpt": body[:EXCERPT_CHARS], "fetched_at": now,
+                "excerpt": excerpt, "fetched_at": now,
             }
         except Exception:
             return {
@@ -525,6 +543,10 @@ class GroundTruth(gl.Contract):
                 return mine["gate"] == "NO_EVIDENCE"   # agree only on shared blindness
             if mine["gate"] == "NO_EVIDENCE":
                 return False
+            # The dossier is part of the record this round writes, so it is
+            # part of what validators must agree on — not just the verdict.
+            if not self._evidence_bound(theirs.get("evidence"), mine.get("evidence")):
+                return False
             lj, vj = theirs.get("judgment"), mine.get("judgment")
             if not isinstance(lj, dict) or not isinstance(vj, dict):
                 return False
@@ -552,14 +574,10 @@ class GroundTruth(gl.Contract):
                 return self._validator_error_path(leaders_res, leader)
             theirs = leaders_res.calldata
             mine = leader()
-            if not isinstance(theirs, list) or len(theirs) != len(mine):
-                return False
-            for lf, vf in zip(theirs, mine):
-                if not isinstance(lf, dict):
-                    return False
-                if lf.get("status") == "OK" and vf["status"] != "OK":
-                    return False   # leader claims content this validator can't see
-            return True
+            # Same binding as the evaluation round: challenge exhibits become
+            # the record a second panel judges, so the URLs, their order and
+            # each row's self-consistent digest are consensus-checked too.
+            return self._evidence_bound(theirs, mine)
 
         return gl.vm.run_nondet_unsafe(leader, validator)
 
@@ -614,6 +632,49 @@ class GroundTruth(gl.Contract):
         return gl.vm.run_nondet_unsafe(leader, validator)
 
     # ── record helpers (deterministic) ───────────────────────────────────────
+    @staticmethod
+    def _evidence_bound(theirs, mine) -> bool:
+        """Bind the RECORDED DOSSIER to validator agreement.
+
+        The judgment was always consensus-checked, but the evidence rows
+        stored beside it were whatever the leader returned — so a dishonest
+        leader could pass equivalence on the verdict while writing a
+        fabricated URL, digest and excerpt into the permanent record that a
+        dispute panel later reads. Validators now compare the record itself.
+
+        What is compared is what every honest validator must independently
+        reproduce: the row count, the URL of each row in order, and the
+        readability claim. Excerpt bytes are deliberately NOT compared — two
+        honest fetches of a live page differ — but each row's digest must
+        cover its own excerpt, so the stored record is internally consistent
+        and re-verifiable at reassessment."""
+        if not isinstance(theirs, list) or not isinstance(mine, list):
+            return False
+        if len(theirs) != len(mine):
+            return False
+        for lf, vf in zip(theirs, mine):
+            if not isinstance(lf, dict):
+                return False
+            if str(lf.get("url", "")) != str(vf.get("url", "")):
+                return False          # a source no validator fetched
+            if lf.get("status") == "OK":
+                if vf.get("status") != "OK":
+                    return False      # content this validator cannot see
+                ex = str(lf.get("excerpt", ""))
+                if not ex or _sha256(ex) != str(lf.get("sha256", "")):
+                    return False      # digest does not cover the stored bytes
+        return True
+
+    @staticmethod
+    def _dossier_intact(rows) -> bool:
+        """Re-verify a stored dossier before a later panel reads it: every
+        readable row's digest must still cover its excerpt."""
+        for e in rows or []:
+            if getattr(e, "status", "") == "OK":
+                if _sha256(str(e.excerpt)) != str(e.sha256):
+                    return False
+        return True
+
     def _record_evidence(self, agreement_id: int, evaluation_id: int,
                          rows: list, kind: str) -> list:
         ids = []
@@ -876,6 +937,17 @@ class GroundTruth(gl.Contract):
             raise gl.vm.UserError(f"{ERROR_EXPECTED} challenged evaluation missing")
         now = self._now_or_fail()
 
+        # S14 integrity gate: prove the stored record still matches the
+        # digests written when it was recorded, BEFORE the second panel reads
+        # a byte of it. Now that a digest covers exactly the stored excerpt,
+        # this is a check that can actually be performed.
+        recorded = [self.evidence.get(eid) for eid in challenged.evidence_ids]
+        exhibits = [self.evidence.get(eid) for eid in a.d_evidence_ids]
+        if not self._dossier_intact([e for e in recorded if e is not None]) or \
+           not self._dossier_intact([e for e in exhibits if e is not None]):
+            raise gl.vm.UserError(
+                f"{ERROR_EXPECTED} the recorded dossier failed its integrity check")
+
         recorded_parts = []
         for i, eid in enumerate(challenged.evidence_ids):
             e = self.evidence.get(eid)
@@ -907,7 +979,14 @@ class GroundTruth(gl.Contract):
             raise gl.vm.UserError(f"{ERROR_LLM} reassessment returned nothing usable")
         j = _validate_judgment(out["judgment"], int(a.threshold_bps))
 
-        ev_id = self._record_evaluation(a, agreement_id, "REASSESSMENT", now, False, j, [])
+        # The TIMING RULE binds the second panel exactly as it binds the
+        # first: "not yet" is not "failed". Hardcoding provisional=False here
+        # let a pre-deadline reversal to NOT_SATISFIED refund immediately —
+        # and the DISPUTED/RESOLVED branch of settle() waits for no window,
+        # so there was no later gate to catch it either.
+        provisional = j["verdict"] == "NOT_SATISFIED" and now < int(a.deadline)
+        ev_id = self._record_evaluation(a, agreement_id, "REASSESSMENT", now,
+                                        provisional, j, [])
         # link the challenge exhibits to the reassessment that judged them
         for eid in a.d_evidence_ids:
             e = self.evidence.get(eid)
@@ -972,8 +1051,25 @@ class GroundTruth(gl.Contract):
             raise gl.vm.UserError(f"{ERROR_EXPECTED} nothing to settle in state {a.state}")
 
         final = self.evaluations.get(a.latest_eval_id)
-        if final is None or final.provisional or final.verdict == "INCONCLUSIVE":
+        if final is None or final.verdict == "INCONCLUSIVE":
             raise gl.vm.UserError(f"{ERROR_EXPECTED} no conclusive verdict to settle on")
+        # A provisional finding is "not yet", not "failed" — it ripens at the
+        # deadline rather than being void forever. Reading the stored flag as
+        # permanent would strand a pre-deadline dispute reversal: the second
+        # panel resolves the dispute, and there is no second reassessment to
+        # re-judge it, so the escrow could never leave.
+        if final.provisional and now < int(a.deadline):
+            raise gl.vm.UserError(
+                f"{ERROR_EXPECTED} the finding is provisional until the deadline — "
+                f"{int(a.deadline) - now}s remain before a miss becomes conclusive")
+        # Defense in depth on the money boundary: _validate_judgment already
+        # coerces an insufficient verdict to INCONCLUSIVE, so this can only
+        # fire on a record written by an earlier policy — but the escrow is
+        # exactly where an unsupported finding must not be honoured.
+        if not final.sufficient:
+            raise gl.vm.UserError(
+                f"{ERROR_EXPECTED} the panel judged the evidence insufficient — "
+                f"nothing settles on a finding the evidence cannot support")
 
         split = _settlement_split(int(a.amount_atto), int(final.bucket),
                                   int(a.threshold_bps), int(a.floor_bps),

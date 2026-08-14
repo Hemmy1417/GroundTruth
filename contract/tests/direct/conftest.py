@@ -1,9 +1,15 @@
 """Shared machinery for GroundTruth direct tests.
 
-Direct mode runs the LEADER function only — validator equivalence is not
-exercised here (integration territory). What direct mode CAN prove: every
-deterministic rule, every state transition, every authorization gate, every
-window, and the exact way agreed judgments map to money.
+Direct mode runs the LEADER function by default, but it CAN drive the
+contract's real validator closures: `direct_vm.run_validator(leader_result=…)`
+replays a captured validator against any payload, which is how the dossier
+tests prove a forged evidence array is rejected. This file used to claim
+validator equivalence was "integration territory" — that was wrong, and the
+belief is what left the leader-authored-dossier path untested.
+
+What direct mode proves: every deterministic rule, every state transition,
+every authorization gate, every window, the exact way agreed judgments map to
+money, and — via run_validator — what validators will and will not accept.
 
 Mocks ACCUMULATE — re-registering a pattern does not replace the earlier
 answer. Clear first (mock_clock does), then re-register source mocks.

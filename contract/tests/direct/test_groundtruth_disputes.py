@@ -109,7 +109,14 @@ def test_reversed_refunds_bond_and_corrected_verdict_settles(direct_vm, direct_d
     assert a["dispute"]["state"] == "RESOLVED"
     assert a["latest_eval_id"] == out["reassessment_eval_id"]   # corrected verdict rules
     assert stats(c)["bonds_held_atto"] == "0"                   # bond went home
-    # settle now runs on the corrected NOT_SATISFIED@60 → PRO_RATA
+    # The TIMING RULE binds the second panel too: a NOT_SATISFIED reversal
+    # BEFORE the deadline is provisional — "not yet" is not "failed" — so it
+    # records and refunds the bond but must not settle yet.
+    direct_vm.sender = direct_alice
+    with pytest.raises(Exception, match="provisional until the deadline"):
+        c.settle(aid)
+    # past the deadline the same corrected verdict becomes conclusive
+    mock_clock(direct_vm, DEADLINE + 60)
     direct_vm.sender = direct_alice
     s = json.loads(c.settle(aid))
     assert s["rule"] == "PRO_RATA"

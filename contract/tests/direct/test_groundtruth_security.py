@@ -87,7 +87,10 @@ def test_bond_pays_out_exactly_once_across_reassess_then_settle(direct_vm, direc
     except Exception:
         raised = True
     assert raised
-    # settle the corrected verdict; escrow conserves, bonds stay zero
+    # settle the corrected verdict; escrow conserves, bonds stay zero.
+    # The reversal was pre-deadline and therefore provisional, so the clock
+    # has to reach the deadline before anything settles.
+    mock_clock(direct_vm, DEADLINE + 60)
     direct_vm.sender = direct_alice
     s = json.loads(c.settle(aid))
     assert int(s["payee_atto"]) + int(s["payer_atto"]) + int(s["keeper_atto"]) == AMOUNT

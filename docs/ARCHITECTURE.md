@@ -216,11 +216,18 @@ well control one (a contractor's own progress page). Four defenses, layered:
 1. **Mutual assent, frozen** — the payer's funding transaction is on-chain
    approval of the exact source list; it cannot change afterward (only a
    dispute can introduce new sources, hashed at filing).
-2. **Integrity-bound at the boundary** — each evaluation hashes exactly the
-   bytes it fetched, at fetch time, and stores the excerpt + its sha256 on-chain;
-   the dispute panel then judges those RECORDED on-chain excerpts (S14) — the
-   tamper-proof record, not a live refetch used as evidence — and *separately*
-   re-fetches only to make post-ruling edits *visible* as tampering signals.
+2. **Integrity-bound at the boundary, and consensus-bound** — each evaluation
+   stores the excerpt plus a sha256 over *exactly those recorded bytes*, so
+   the digest is re-verifiable by anyone (a hash over the full fetched body
+   would cover bytes that are never stored, and could never be checked). The
+   dossier is not the leader's word for it: validators compare the recorded
+   array itself — row count, each row's URL in order, and the readability
+   claim — and reject a leader whose digest does not cover its own excerpt.
+   Excerpt *bytes* are deliberately not compared, because two honest fetches
+   of a live page differ. The dispute panel re-verifies every digest before
+   reading a byte (S14), judges those RECORDED excerpts — the tamper-evident
+   record, not a live refetch used as evidence — and *separately* re-fetches
+   only to make post-ruling edits *visible* as tampering signals.
 3. **Source-nature weighing in the prompt** — the panel is instructed that
    self-published party sources carry less evidentiary weight than
    independent ones (registries, inspection records), and that
@@ -299,16 +306,16 @@ balance), the repo-level signed-write test (S6), genvm-lint in CI.
 | S2 | verdicts rest on contract-fetched evidence; challenge window is a real, clock-enforced response opportunity |
 | S3 | no third-party pooling — escrow tracked to its agreement, bonds to their disputant |
 | S4 | ARMED challenge window before any settlement drain; bonded challenge |
-| S5 | INCONCLUSIVE/ERROR never settle; unreachable sources are information failures; hard failures revert |
+| S5 | INCONCLUSIVE/ERROR never settle; a conclusive verdict the panel calls evidence-insufficient is COERCED to INCONCLUSIVE (sufficiency gates every verdict, not just the positive one); unreachable sources are information failures; hard failures revert |
 | S6 | provider-injected genlayer-js client; repo signed-write test |
-| S7 | verdict + completion_bucket + evidence_sufficient all pinned; advisory fields outside equivalence and outside money |
+| S7 | verdict + completion_bucket + evidence_sufficient all pinned, AND the recorded evidence array (count, per-row url, order, readability, digest-covers-excerpt) is consensus-compared — the dossier is not leader-authored; advisory fields outside equivalence and outside money |
 | S8 | mutual-assent frozen sources; hash-bound reads; source-nature weighing; statements-are-context rule |
 | S9 | real GEN escrow settles on the verdict — the adjudication is load-bearing |
 | S10 | indexed views only |
 | S11 | direct + adversarial + wei-conservation + signed-write suites, CI |
 | S12 | advisory badges; public-on-chain statements never called sealed; honest clock language; demo honesty statement |
 | S13 | multi-source wall-clock (3 cross-checked cdn sources + Ethereum-block floor), asymmetric guard, fail-closed, arming requires a live clock |
-| S14 | dispute panel judges the on-chain RECORDED excerpts (not a live refetch); a fresh refetch is included only to surface post-ruling edits |
+| S14 | dispute panel judges the on-chain RECORDED excerpts (not a live refetch) and re-verifies every digest against its stored excerpt before reading, which the digest now covers; a fresh refetch is included only to surface post-ruling edits |
 | S15 | single funding path; single challenge path; challenge/settle boundary race excluded by construction |
 | S16 | validated ruling struct with coherence rules before any state read |
 | S17 | stale-dispute terminal escape (permissionless, wall-clock, defined rule: original verdict stands, bond refunded) + EXPIRED refund path |
