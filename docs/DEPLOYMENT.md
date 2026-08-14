@@ -4,8 +4,8 @@
 
 | | |
 |---|---|
-| Contract | `0xc05383b8B70603bA4858c97673D5Cc313196c7AB` |
-| Deploy tx | `0x7d9227eccfce462a945426c778117b42c84eda3c0291070dbf576cb0a1eb3970` |
+| Contract | `0x8F2D07F0Dd6a13723Af596ae905B5974B6BD3FFd` |
+| Deploy tx | `0x2de2ea034f982e1634d4e5cfe5699111a4b12c9d51d7692fd5bac1f0c94f858f` |
 | Version | v0.2.0 — the third judge letter |
 | Consensus | ACCEPTED |
 | Deployer/owner | `0x10dbf82a8bb191bd1c082de5ef915e998aa5ccd7` |
@@ -14,7 +14,12 @@
 | Runner | pinned `py-genlayer:1jb45aa8…jpz09h6` |
 
 Supersedes v0.1.0 `0x5D35a58B2e5e131F837D70Fe0CcC8901772435A9`, which remains
-readable on-chain but is no longer served by the app.
+readable on-chain but is no longer served by the app. A first v0.2.0 deploy at
+`0xc05383b8…c7AB` was replaced within the hour: `genvm-lint` rejects a contract
+method declared `@staticmethod` (E022), so the two new dossier helpers were
+changed to ordinary methods — behaviour identical, but the deployed bytecode
+would no longer have matched the source, and that byte-match is a claim this
+file makes. Redeployed rather than weaken it.
 
 ### What v0.2.0 changed (judge letter, 2026-08-14)
 
@@ -66,12 +71,12 @@ deliberate breakages is caught by at least one test.
 Seed transactions:
 
 ```text
-create #1    0x053a225fef…f03fb0
-accept #1    0x565e38fa92…96a5b3
-evaluate #1  0x32f9970ab3…2fd938   -> SATISFIED @ 100%, sufficient=true -> ARMED
-create #2    0x7c8b83d0c7…04dd6d
-accept #2    0x6dd8939303…92bff0
-challenge #1 0xb20e7ae7f7…5e119b   -> DISPUTED, 1 GEN bond, audit-note exhibit
+create #1    0x22b7664b7f…7ac9c2
+accept #1    0x41dfd3fabc…bd3b7e
+evaluate #1  0x5802537e19…e56de3   -> SATISFIED @ 100%, sufficient=true -> ARMED
+create #2    0x229a640909…acd36d
+accept #2    0xe032cd34cd…86dbe0
+challenge #1 0xfe95fb4537…da3f68   -> DISPUTED, 1 GEN bond, audit-note exhibit
 ```
 
 Escrow held 1.0 GEN, bonds held 1.0 GEN at seed time.
@@ -170,7 +175,7 @@ before the first build — `NEXT_PUBLIC_*` are baked in at build time):
 
 | Var | Value | Needed for |
 |---|---|---|
-| `NEXT_PUBLIC_CONTRACT_ADDRESS` | `0xc05383b8B70603bA4858c97673D5Cc313196c7AB` | **required** (the live main contract) |
+| `NEXT_PUBLIC_CONTRACT_ADDRESS` | `0x8F2D07F0Dd6a13723Af596ae905B5974B6BD3FFd` | **required** (the live main contract) |
 | `NEXT_PUBLIC_GENLAYER_RPC_URL` | `https://studio.genlayer.com/api` | has default |
 | `NEXT_PUBLIC_GENLAYER_CHAIN_ID` | `61999` | has default |
 | `GENLAYER_RPC_URL` | `https://studio.genlayer.com/api` | server proxy; has default |

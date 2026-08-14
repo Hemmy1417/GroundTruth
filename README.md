@@ -13,7 +13,7 @@ settles. One primitive: **define → evidence → judgment → consensus →
 ## Status
 
 **Live: [groundtruth-gen.vercel.app](https://groundtruth-gen.vercel.app)** —
-contract `0xc05383b8B70603bA4858c97673D5Cc313196c7AB` (v0.2.0, GenLayer
+contract `0x8F2D07F0Dd6a13723Af596ae905B5974B6BD3FFd` (v0.2.0, GenLayer
 StudioNet). 90 direct tests + 30 web tests green, genvm-lint clean, deployed
 bytecode byte-matches source. Full lifecycle proven on-chain — both dispute
 branches, a negotiated exit, and a mismatched-evidence refusal — tx hashes in
@@ -47,10 +47,17 @@ the question returns INCONCLUSIVE and moves nothing — try it.
   binary YES/NO is just threshold = 100.
 - **Consensus decides meaning, code decides money:** validators agree on
   `verdict`, `completion_bucket`, `evidence_sufficient` (all pinned in
-  equivalence); a pure versioned table computes the split. No LLM authors an
-  amount.
-- **One bonded dispute round** judging the RECORDED dossier plus the
-  challenger's new evidence (hashed at filing), then final.
+  equivalence) **and on the recorded dossier itself** — row count, each
+  source URL in order, whether it was readable, and that every digest covers
+  its own stored excerpt. A leader cannot agree on the verdict and still
+  write a fabricated record. A pure versioned table computes the split; no
+  LLM authors an amount.
+- **Sufficiency gates every conclusive verdict, in both directions:** a panel
+  that reports NOT_SATISFIED while declaring its own evidence insufficient has
+  established nothing, so it is recorded as INCONCLUSIVE and settles nothing.
+- **One bonded dispute round** judging the RECORDED dossier — every digest
+  re-verified before the second panel reads a byte — plus the challenger's new
+  evidence (hashed at filing), then final.
 - **Fails safe:** INCONCLUSIVE never settles; early NOT_SATISFIED is
   provisional ("not yet" ≠ "failed"); unreachable evidence is an information
   failure; unresolved disputes have a permissionless terminal escape.

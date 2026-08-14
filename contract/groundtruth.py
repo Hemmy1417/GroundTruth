@@ -632,8 +632,7 @@ class GroundTruth(gl.Contract):
         return gl.vm.run_nondet_unsafe(leader, validator)
 
     # ── record helpers (deterministic) ───────────────────────────────────────
-    @staticmethod
-    def _evidence_bound(theirs, mine) -> bool:
+    def _evidence_bound(self, theirs, mine) -> bool:
         """Bind the RECORDED DOSSIER to validator agreement.
 
         The judgment was always consensus-checked, but the evidence rows
@@ -665,8 +664,7 @@ class GroundTruth(gl.Contract):
                     return False      # digest does not cover the stored bytes
         return True
 
-    @staticmethod
-    def _dossier_intact(rows) -> bool:
+    def _dossier_intact(self, rows) -> bool:
         """Re-verify a stored dossier before a later panel reads it: every
         readable row's digest must still cover its excerpt."""
         for e in rows or []:
