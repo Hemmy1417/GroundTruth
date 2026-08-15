@@ -109,8 +109,12 @@ export default function AgreementFilePage({ params }: { params: Promise<{ id: st
   const evidenceIds = useMemo(() => {
     const ids = new Set<number>();
     for (const ev of evaluations) ev.evidence_ids.forEach((i) => ids.add(i));
+    // Challenge exhibits belong to no evaluation until a reassessment links
+    // them, so they must be pulled from the dispute itself — otherwise the
+    // dispute room reports "no new sources filed" while the record holds one.
+    (a?.dispute?.evidence_ids ?? []).forEach((i: number) => ids.add(i));
     return [...ids];
-  }, [evaluations]);
+  }, [evaluations, a]);
   const evidenceQueries = useEvidenceSet(evidenceIds);
   const evidence = useMemo(() => {
     const m = new Map<number, EvidenceView>();

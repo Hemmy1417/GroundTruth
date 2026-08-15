@@ -13,7 +13,7 @@ settles. One primitive: **define → evidence → judgment → consensus →
 ## Status
 
 **Live: [groundtruth-gen.vercel.app](https://groundtruth-gen.vercel.app)** —
-contract `0x8F2D07F0Dd6a13723Af596ae905B5974B6BD3FFd` (v0.2.0, GenLayer
+contract `0xF638B81E1470faf36997f2370185254eE284A19F` (v0.2.0, GenLayer
 StudioNet). 90 direct tests + 30 web tests green, genvm-lint clean, deployed
 bytecode byte-matches source. Full lifecycle proven on-chain — both dispute
 branches, a negotiated exit, and a mismatched-evidence refusal — tx hashes in

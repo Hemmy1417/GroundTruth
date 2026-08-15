@@ -1214,6 +1214,12 @@ class GroundTruth(gl.Contract):
                 "reassess_eval_id": int(a.d_reassess_eval_id),
                 "window_ends": int(a.d_window_ends),
                 "terminal_at": int(a.d_terminal_at),
+                # Challenge exhibits carry evaluation_id 0 until a reassessment
+                # links them, so they appear in no evaluation's list. Without
+                # these ids a reader cannot discover snapshotted exhibits at
+                # all, and the dispute room reports "no new sources filed"
+                # while the record holds one.
+                "evidence_ids": [int(x) for x in a.d_evidence_ids],
             },
             "settlement": {
                 "settled": bool(a.s_settled), "payee_atto": str(int(a.s_payee)),

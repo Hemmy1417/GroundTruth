@@ -61,6 +61,7 @@ export interface DisputeView {
   reassess_eval_id: number; // 0 = none
   window_ends: number; // challenge window end (epoch; 0 = not armed)
   terminal_at: number; // stale-dispute escape becomes callable (0 = n/a)
+  evidence_ids?: number[]; // challenge exhibits; unlinked from any evaluation until reassess
 }
 
 export interface SettlementView {

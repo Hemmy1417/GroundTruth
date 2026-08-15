@@ -231,6 +231,35 @@ def test_validator_rejects_a_forged_challenge_snapshot(
 
 # ── the digest is re-verifiable, and re-verified ─────────────────────────────
 
+def test_challenge_exhibits_are_discoverable_from_the_dispute(
+        direct_vm, direct_deploy, direct_owner, direct_alice, direct_bob):
+    """A snapshotted exhibit carries evaluation_id 0 until a reassessment links
+    it, so it appears in NO evaluation's evidence_ids. If the dispute view does
+    not expose its own ids the exhibit is unreachable by any reader, and the
+    dispute room truthfully-looking reports "no new sources filed" while the
+    record holds one — a false statement about recorded evidence."""
+    c, aid, out = evaluated(direct_vm, direct_deploy, direct_owner, direct_alice,
+                            direct_bob, verdict="SATISFIED", bucket=95)
+    mock_clock(direct_vm, T_EVAL + 3600)
+    mock_sources(direct_vm, "Audit note: certificate pending.")
+    direct_vm.sender = direct_alice
+    direct_vm.value = BOND
+    c.challenge(aid, "Certificate is pending.",
+                json.dumps(["https://audit.gt-example.com/note"]))
+    direct_vm.value = 0
+
+    a = agreement_view(c, aid)
+    ids = a["dispute"]["evidence_ids"]
+    assert len(ids) == 1, "the dispute must expose its own exhibit ids"
+    ex = evidence_view(c, ids[0])
+    assert ex["kind"] == "CHALLENGE"
+    assert ex["url"] == "https://audit.gt-example.com/note"
+    assert ex["evaluation_id"] == 0        # exactly why it needs its own list
+    # and it is in no evaluation's list, which is what makes the view essential
+    ev = eval_view(c, out["evaluation_id"])
+    assert ids[0] not in ev["evidence_ids"]
+
+
 def test_recorded_digest_covers_the_recorded_bytes(
         direct_vm, direct_deploy, direct_owner, direct_alice, direct_bob):
     """A digest over bytes that are never stored can never be checked by

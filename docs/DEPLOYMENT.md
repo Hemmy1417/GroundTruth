@@ -4,8 +4,8 @@
 
 | | |
 |---|---|
-| Contract | `0x8F2D07F0Dd6a13723Af596ae905B5974B6BD3FFd` |
-| Deploy tx | `0x2de2ea034f982e1634d4e5cfe5699111a4b12c9d51d7692fd5bac1f0c94f858f` |
+| Contract | `0xF638B81E1470faf36997f2370185254eE284A19F` |
+| Deploy tx | `0xdc0cfb319e1f84df46bffc14c0aef796e363bf45fe8903bf0ccc2d4a7309ca9f` |
 | Version | v0.2.0 — the third judge letter |
 | Consensus | ACCEPTED |
 | Deployer/owner | `0x10dbf82a8bb191bd1c082de5ef915e998aa5ccd7` |
@@ -19,7 +19,13 @@ readable on-chain but is no longer served by the app. A first v0.2.0 deploy at
 method declared `@staticmethod` (E022), so the two new dossier helpers were
 changed to ordinary methods — behaviour identical, but the deployed bytecode
 would no longer have matched the source, and that byte-match is a claim this
-file makes. Redeployed rather than weaken it.
+file makes. Redeployed rather than weaken it. A second replacement followed
+(`0x8F2D07F0…3FFd`): verifying the live dispute room showed it reporting "no
+new sources filed" while the record held a snapshotted challenge exhibit —
+challenge evidence carries `evaluation_id = 0` until a reassessment links it,
+so it appears in no evaluation's list, and the dispute view did not expose its
+own `evidence_ids`. The exhibit was unreachable by any reader. The view now
+returns them.
 
 ### What v0.2.0 changed (judge letter, 2026-08-14)
 
@@ -71,12 +77,12 @@ deliberate breakages is caught by at least one test.
 Seed transactions:
 
 ```text
-create #1    0x22b7664b7f…7ac9c2
-accept #1    0x41dfd3fabc…bd3b7e
-evaluate #1  0x5802537e19…e56de3   -> SATISFIED @ 100%, sufficient=true -> ARMED
-create #2    0x229a640909…acd36d
-accept #2    0xe032cd34cd…86dbe0
-challenge #1 0xfe95fb4537…da3f68   -> DISPUTED, 1 GEN bond, audit-note exhibit
+create #1    0x762b0b0649…301854
+accept #1    0x73afff01d6…449807
+evaluate #1  0xe0f203d500…841bec   -> SATISFIED @ 100%, sufficient=true -> ARMED
+create #2    0xaf1791962f…649305
+accept #2    0x8a4f41f6ac…6ee64a
+challenge #1 0x3318aa13c1…c4f8dc   -> DISPUTED, 1 GEN bond, audit-note exhibit
 ```
 
 Escrow held 1.0 GEN, bonds held 1.0 GEN at seed time.
@@ -175,7 +181,7 @@ before the first build — `NEXT_PUBLIC_*` are baked in at build time):
 
 | Var | Value | Needed for |
 |---|---|---|
-| `NEXT_PUBLIC_CONTRACT_ADDRESS` | `0x8F2D07F0Dd6a13723Af596ae905B5974B6BD3FFd` | **required** (the live main contract) |
+| `NEXT_PUBLIC_CONTRACT_ADDRESS` | `0xF638B81E1470faf36997f2370185254eE284A19F` | **required** (the live main contract) |
 | `NEXT_PUBLIC_GENLAYER_RPC_URL` | `https://studio.genlayer.com/api` | has default |
 | `NEXT_PUBLIC_GENLAYER_CHAIN_ID` | `61999` | has default |
 | `GENLAYER_RPC_URL` | `https://studio.genlayer.com/api` | server proxy; has default |
