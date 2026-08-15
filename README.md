@@ -14,10 +14,17 @@ settles. One primitive: **define → evidence → judgment → consensus →
 
 **Live: [groundtruth-gen.vercel.app](https://groundtruth-gen.vercel.app)** —
 contract `0xF638B81E1470faf36997f2370185254eE284A19F` (v0.2.0, GenLayer
-StudioNet). 90 direct tests + 30 web tests green, genvm-lint clean, deployed
+StudioNet). 91 direct tests + 30 web tests green, genvm-lint clean, deployed
 bytecode byte-matches source. Full lifecycle proven on-chain — both dispute
 branches, a negotiated exit, and a mismatched-evidence refusal — tx hashes in
 `docs/DEPLOYMENT.md`.
+
+**v0.2.0 answers a review of v0.1** that found two ways the record could lie:
+the stored dossier was whatever the round's leader returned rather than
+something validators checked, and an "evidence insufficient" finding could
+still move money if it was phrased as NOT_SATISFIED. Both are closed, each
+fix is pinned by a test that fails when the fix is removed, and
+`docs/DEPLOYMENT.md` records what changed and why every address was replaced.
 
 ## Live demo — a real dispute is waiting
 
@@ -26,7 +33,7 @@ Reading needs no wallet. The docket at
 
 | # | State | What you can do |
 |---|---|---|
-| 1 | **DISPUTED** — 1 GEN bond posted | Open the dispute room: panel 1's recorded dossier (SATISFIED @ 100), the bonded challenge citing an audit note, both evidence hashes. **Reassess is permissionless** — connect any funded StudioNet wallet and trigger the second panel yourself; the bond routes on-chain by the verdict. |
+| 1 | **DISPUTED** — 1 GEN bond posted | The dispute room shows the conflict as the second panel will read it: the recorded dossier (building registry, certificate **ISSUED**, `sha256:e3165504…`, judged SATISFIED @ 100) against the challenge exhibit (audit office, countersignature **PENDING**, `sha256:c185f2f8…`). Both were fetched by the contract, not uploaded. **Reassess is permissionless** — connect any funded StudioNet wallet, trigger the second panel yourself, and watch the bond route on-chain by the verdict. |
 | 2 | **FUNDED** — awaiting judgment | Press **Request evaluation** and watch a validator panel fetch the registry and rule live. It arms a challenge window you can then contest or settle. |
 
 Or create your own: point a new agreement at a public evidence URL, accept
@@ -68,7 +75,9 @@ the question returns INCONCLUSIVE and moves nothing — try it.
 # web
 cd web && npm install && npm run dev
 
-# contract checks (Phase 5+)
+# contract — BOTH gates, in this order; CI runs the same two and the linter
+# rejects things the tests never see (a @staticmethod on a contract method
+# is an E022, and no test will tell you)
 cd contract && genvm-lint check groundtruth.py --json && pytest tests/direct/ -q
 ```
 
